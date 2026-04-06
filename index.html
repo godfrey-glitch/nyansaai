@@ -607,24 +607,52 @@ function handleSignup(){
   const email=document.getElementById('su-email').value.trim().toLowerCase();
   const pw=document.getElementById('su-pw').value;
   const confirm=document.getElementById('su-confirm').value;
+  const school=document.getElementById('su-school').value.trim();
   if(!name){showErr('Please enter your full name.');return;}
   if(!email.includes('@')){showErr('Please enter a valid email.');return;}
   if(pw.length<6){showErr('Password must be at least 6 characters.');return;}
   if(pw!==confirm){showErr('Passwords do not match.');return;}
-  const users=getUsers();if(users[email]){showErr('Email already registered.');return;}
-  const user={name,email,school:document.getElementById('su-school').value.trim(),role:selectedRole,avatar:name.slice(0,2).toUpperCase()};
-  users[email]={...user,pw:btoa(pw)};localStorage.setItem('em_u',JSON.stringify(users));
-  saveSession(user);currentUser=user;showOk('Account created! 🎉');
-  setTimeout(()=>{applySession();goPage('home');confetti();toast('Welcome, '+name.split(' ')[0]+'! 🇬🇭','🎓','green',4000);},900);
+  // Try Firebase first, fallback to localStorage
+  if(window.fbSignUp){
+    showOk('Creating your account...');
+    window.fbSignUp(email, pw, name, selectedRole, '').then(fbUser=>{
+      const user={name,email,school,role:selectedRole,avatar:name.slice(0,2).toUpperCase(),uid:fbUser.uid};
+      saveSession(user);currentUser=user;
+      setTimeout(()=>{applySession();goPage('home');confetti();toast('Welcome, '+name.split(' ')[0]+'! 🇬🇭','🎓','green',4000);},900);
+    }).catch(err=>{
+      if(err.code==='auth/email-already-in-use'){showErr('Email already registered. Try signing in.');}
+      else{showErr(err.message||'Signup failed. Please try again.');}
+    });
+  } else {
+    const users=getUsers();if(users[email]){showErr('Email already registered.');return;}
+    const user={name,email,school,role:selectedRole,avatar:name.slice(0,2).toUpperCase()};
+    users[email]={...user,pw:btoa(pw)};localStorage.setItem('em_u',JSON.stringify(users));
+    saveSession(user);currentUser=user;showOk('Account created! 🎉');
+    setTimeout(()=>{applySession();goPage('home');confetti();toast('Welcome, '+name.split(' ')[0]+'! 🇬🇭','🎓','green',4000);},900);
+  }
 }
 function handleLogin(){
   const email=document.getElementById('li-email').value.trim().toLowerCase();
   const pw=document.getElementById('li-pw').value;
   if(!email||!pw){showErr('Please fill in both fields.');return;}
-  const users=getUsers();const user=users[email];
-  if(!user||user.pw!==btoa(pw)){showErr('Incorrect email or password.');return;}
-  const {pw:_,...safe}=user;currentUser=safe;saveSession(safe);applySession();goPage('home');
-  toast('Welcome back, '+safe.name.split(' ')[0]+'! 🇬🇭','👋','gold',3000);
+  // Try Firebase first, fallback to localStorage
+  if(window.fbSignIn){
+    showOk('Signing in...');
+    window.fbSignIn(email, pw).then(fbUser=>{
+      const user={name:fbUser.displayName||email.split('@')[0],email,role:'student',avatar:(fbUser.displayName||email).slice(0,2).toUpperCase(),uid:fbUser.uid};
+      saveSession(user);currentUser=user;applySession();goPage('home');
+      toast('Welcome back, '+user.name.split(' ')[0]+'! 🇬🇭','👋','gold',3000);
+    }).catch(err=>{
+      if(err.code==='auth/invalid-credential'||err.code==='auth/wrong-password'){showErr('Incorrect email or password.');}
+      else if(err.code==='auth/user-not-found'){showErr('No account found. Please sign up.');}
+      else{showErr(err.message||'Sign in failed. Please try again.');}
+    });
+  } else {
+    const users=getUsers();const user=users[email];
+    if(!user||user.pw!==btoa(pw)){showErr('Incorrect email or password.');return;}
+    const {pw:_,...safe}=user;currentUser=safe;saveSession(safe);applySession();goPage('home');
+    toast('Welcome back, '+safe.name.split(' ')[0]+'! 🇬🇭','👋','gold',3000);
+  }
 }
 function demoLogin(role){
   const names={student:'Kwame Asante',teacher:'Ms. Abena Boateng'};
