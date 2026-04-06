@@ -20,6 +20,7 @@ exports.handler = async function(event) {
   try {
     const body = JSON.parse(event.body);
 
+    // ── Try Groq first ──────────────────────────────────────────────────────
     if (groqKey) {
       const messages = [];
       if (body.system) {
@@ -76,8 +77,11 @@ exports.handler = async function(event) {
           body: JSON.stringify({ error: { message: friendly } })
         };
       }
+
+      console.log('[Nyansa] Groq rate limited — falling back to Gemini');
     }
 
+    // ── Gemini fallback ─────────────────────────────────────────────────────
     const contents = (body.messages || []).map(m => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: typeof m.content === 'string' ? m.content : (m.content[0]?.text || '') }]
