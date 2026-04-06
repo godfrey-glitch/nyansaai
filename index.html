@@ -5180,5 +5180,119 @@ document.addEventListener('DOMContentLoaded', function v5Supplemental() {
 });
 </script>
 
+
+<script type="module">
+// ── Firebase Integration ──────────────────────────────────────────────────
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBhwkBfgVtakP26MHMaI_BckBT5hSXxH2s",
+  authDomain: "nyansa-ai-9498a.firebaseapp.com",
+  projectId: "nyansa-ai-9498a",
+  storageBucket: "nyansa-ai-9498a.firebasestorage.app",
+  messagingSenderId: "788688078262",
+  appId: "1:788688078262:web:f23bf8fef169208b88ad17"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+// ── Save user profile to Firestore ────────────────────────────────────────
+async function saveUserProfile(user, extra = {}) {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName || extra.name || "",
+      role: extra.role || "student",
+      ageGroup: extra.ageGroup || "",
+      createdAt: serverTimestamp(),
+      quizzesTaken: 0,
+      totalScore: 0,
+      streakDays: 0,
+      lastActive: serverTimestamp()
+    });
+  } else {
+    await updateDoc(ref, { lastActive: serverTimestamp() });
+  }
+}
+
+// ── Save quiz result ──────────────────────────────────────────────────────
+window.saveQuizResult = async function(subject, score, total, ageGroup) {
+  if (!auth.currentUser) return;
+  try {
+    await addDoc(collection(db, "quiz_results"), {
+      uid: auth.currentUser.uid,
+      subject, score, total,
+      percent: Math.round((score/total)*100),
+      ageGroup,
+      createdAt: serverTimestamp()
+    });
+    const userRef = doc(db, "users", auth.currentUser.uid);
+    const snap = await getDoc(userRef);
+    if (snap.exists()) {
+      await updateDoc(userRef, {
+        quizzesTaken: (snap.data().quizzesTaken || 0) + 1,
+        totalScore: (snap.data().totalScore || 0) + score,
+        lastActive: serverTimestamp()
+      });
+    }
+  } catch(e) { console.error("saveQuizResult:", e); }
+};
+
+// ── Save chat message ─────────────────────────────────────────────────────
+window.saveChatMessage = async function(role, text) {
+  if (!auth.currentUser) return;
+  try {
+    await addDoc(collection(db, "chat_history"), {
+      uid: auth.currentUser.uid,
+      role, text,
+      createdAt: serverTimestamp()
+    });
+  } catch(e) { console.error("saveChatMessage:", e); }
+};
+
+// ── Auth state listener ───────────────────────────────────────────────────
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    window._firebaseUser = user;
+    await saveUserProfile(user);
+    console.log("%cFirebase: signed in as " + user.email, "color:#006b3f;font-weight:700;");
+  } else {
+    window._firebaseUser = null;
+  }
+});
+
+// ── Expose auth functions globally ────────────────────────────────────────
+window.fbSignUp = async function(email, password, name, role, ageGroup) {
+  const cred = await createUserWithEmailAndPassword(auth, email, password);
+  await saveUserProfile(cred.user, { name, role, ageGroup });
+  return cred.user;
+};
+
+window.fbSignIn = async function(email, password) {
+  const cred = await signInWithEmailAndPassword(auth, email, password);
+  return cred.user;
+};
+
+window.fbGoogleSignIn = async function() {
+  const cred = await signInWithPopup(auth, googleProvider);
+  await saveUserProfile(cred.user);
+  return cred.user;
+};
+
+window.fbSignOut = async function() {
+  await signOut(auth);
+};
+
+console.log("%cNyansa AI Firebase ready ✓", "color:#d4960a;font-weight:700;");
+</script>
+
 </body>
 </html>
