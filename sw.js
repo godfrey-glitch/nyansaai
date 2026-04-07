@@ -1,200 +1,144 @@
-// Nyansa AI — Daily Study Reminder Module
-// Handles permission requests, scheduling, and UI
+// Nyansa AI — Service Worker v4 (with push notifications)
+const CACHE = 'nyansa-v4';
+const ASSETS = [
+  './',
+  './index.html',
+  './styles.css',
+  './app.js',
+  './reminder.js',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+];
 
-var NyansaReminder = (function() {
+// Ghana-themed motivational quotes
+const QUOTES = [
+  { title: '📚 Time to study!', body: 'Open Nyansa AI and keep learning today! 🇬🇭' },
+  { title: '🌟 Akwaaba, Champion!', body: 'A little study every day builds great knowledge. Let\'s go!' },
+  { title: '🏆 Future is yours!', body: 'Every Ghanaian student who studies today leads tomorrow.' },
+  { title: '📖 Study time!', body: 'Nyansa means wisdom — come get yours today! 💡' },
+  { title: '🌍 Keep going!', body: 'Great things take time. Your education is your future. 🇬🇭' },
+  { title: '⭐ You\'ve got this!', body: 'Even Kofi Annan started with the basics. Study today!' },
+  { title: '🎯 Stay focused!', body: 'Your WASSCE/BECE success starts with today\'s study session.' },
+  { title: '💪 Rise & Learn!', body: 'Ghana needs bright minds like yours. Open Nyansa AI now!' },
+];
 
-  var STORAGE_KEY = 'nyansa_reminder';
+self.addEventListener('install', function(event) {
+  event.waitUntil(
+    caches.open(CACHE).then(function(cache) {
+      return cache.addAll(ASSETS);
+    }).catch(function(err) {
+      console.warn('[SW] Cache install failed:', err);
+    })
+  );
+  self.skipWaiting();
+});
 
-  // ── Load saved settings ───────────────────────────────────────────────────
-  function load() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { enabled: false, time: '19:00' };
-    } catch(e) {
-      return { enabled: false, time: '19:00' };
+self.addEventListener('activate', function(event) {
+  event.waitUntil(
+    caches.keys().then(function(keys) {
+      return Promise.all(
+        keys.filter(function(key) { return key !== CACHE; })
+            .map(function(key) { return caches.delete(key); })
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', function(event) {
+  if (event.request.method !== 'GET') return;
+  if (event.request.url.startsWith('chrome-extension')) return;
+  if (event.request.url.includes('.netlify/functions/')) return;
+
+  if (event.request.url.includes('fonts.googleapis.com') ||
+      event.request.url.includes('fonts.gstatic.com') ||
+      event.request.url.includes('fonts.cdnfonts.com')) {
+    event.respondWith(
+      caches.open(CACHE).then(function(cache) {
+        return fetch(event.request).then(function(response) {
+          if (response && response.status === 200) cache.put(event.request, response.clone());
+          return response;
+        }).catch(function() { return caches.match(event.request); });
+      })
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then(function(cached) {
+      var networkFetch = fetch(event.request).then(function(response) {
+        if (response && response.status === 200) {
+          caches.open(CACHE).then(function(cache) { cache.put(event.request, response.clone()); });
+        }
+        return response;
+      }).catch(function() { return cached; });
+      return cached || networkFetch;
+    }).catch(function() {
+      if (event.request.destination === 'document') return caches.match('./index.html');
+    })
+  );
+});
+
+// ── Handle scheduled reminder alarm ──────────────────────────────────────────
+self.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+
+  if (event.data && event.data.type === 'SCHEDULE_REMINDER') {
+    // Store reminder time in SW scope
+    self.reminderTime = event.data.time; // "HH:MM"
+    self.lastSubject = event.data.lastSubject || null;
+    console.log('[SW] Reminder scheduled for', event.data.time);
+  }
+
+  if (event.data && event.data.type === 'TRIGGER_REMINDER') {
+    showReminder(event.data.lastSubject || null);
+  }
+});
+
+// ── Show the notification ─────────────────────────────────────────────────────
+function showReminder(lastSubject) {
+  var quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+
+  // Smart: override with last subject if available
+  var title = quote.title;
+  var body = quote.body;
+
+  if (lastSubject) {
+    // 1 in 3 chance to show smart subject reminder
+    if (Math.random() < 0.33) {
+      title = '📖 Continue learning!';
+      body = 'You were studying ' + lastSubject + ' last time. Pick up where you left off! 🇬🇭';
     }
   }
 
-  // ── Save settings ─────────────────────────────────────────────────────────
-  function save(settings) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-  }
+  self.registration.showNotification(title, {
+    body: body,
+    icon: './icon-192.png',
+    badge: './icon-192.png',
+    tag: 'nyansa-daily-reminder',
+    renotify: true,
+    vibrate: [200, 100, 200],
+    data: { url: 'https://nyansaai.netlify.app' }
+  });
+}
 
-  // ── Request notification permission ──────────────────────────────────────
-  function requestPermission(callback) {
-    if (!('Notification' in window)) {
-      callback(false, 'Your browser does not support notifications.');
-      return;
-    }
-    if (Notification.permission === 'granted') {
-      callback(true);
-      return;
-    }
-    Notification.requestPermission().then(function(result) {
-      callback(result === 'granted', result === 'denied' ? 'Please allow notifications in your browser settings.' : null);
-    });
-  }
-
-  // ── Tell service worker about the schedule ────────────────────────────────
-  function syncWithSW(time, lastSubject) {
-    if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
-    navigator.serviceWorker.controller.postMessage({
-      type: 'SCHEDULE_REMINDER',
-      time: time,
-      lastSubject: lastSubject || null
-    });
-  }
-
-  // ── Check every minute if it's time to fire ───────────────────────────────
-  function startChecker() {
-    // Clear existing checker
-    if (window._reminderInterval) clearInterval(window._reminderInterval);
-
-    window._reminderInterval = setInterval(function() {
-      var settings = load();
-      if (!settings.enabled) return;
-      if (Notification.permission !== 'granted') return;
-
-      var now = new Date();
-      var hh = String(now.getHours()).padStart(2, '0');
-      var mm = String(now.getMinutes()).padStart(2, '0');
-      var currentTime = hh + ':' + mm;
-
-      if (currentTime === settings.time) {
-        // Prevent firing twice in same minute
-        var lastFired = localStorage.getItem('nyansa_last_reminder');
-        var todayKey = now.toDateString() + '_' + settings.time;
-        if (lastFired === todayKey) return;
-        localStorage.setItem('nyansa_last_reminder', todayKey);
-
-        // Get last studied subject
-        var lastSubject = null;
-        try {
-          var hist = JSON.parse(localStorage.getItem('nyansa_history') || '[]');
-          if (hist.length > 0) lastSubject = hist[0].subject || null;
-        } catch(e) {}
-
-        // Trigger via SW
-        if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-          navigator.serviceWorker.controller.postMessage({
-            type: 'TRIGGER_REMINDER',
-            lastSubject: lastSubject
-          });
+// ── Handle notification click ─────────────────────────────────────────────────
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+      for (var i = 0; i < clientList.length; i++) {
+        var client = clientList[i];
+        if (client.url.includes('nyansaai') && 'focus' in client) {
+          return client.focus();
         }
       }
-    }, 60000); // check every minute
-  }
-
-  // ── Enable reminders ──────────────────────────────────────────────────────
-  function enable(time, callback) {
-    requestPermission(function(granted, errMsg) {
-      if (!granted) {
-        callback(false, errMsg || 'Permission denied.');
-        return;
+      if (clients.openWindow) {
+        return clients.openWindow('https://nyansaai.netlify.app');
       }
-      var settings = { enabled: true, time: time };
-      save(settings);
-      syncWithSW(time, null);
-      startChecker();
-      callback(true);
-    });
-  }
-
-  // ── Disable reminders ─────────────────────────────────────────────────────
-  function disable() {
-    var settings = load();
-    settings.enabled = false;
-    save(settings);
-    if (window._reminderInterval) clearInterval(window._reminderInterval);
-  }
-
-  // ── Init on page load ─────────────────────────────────────────────────────
-  function init() {
-    var settings = load();
-    if (settings.enabled && Notification.permission === 'granted') {
-      startChecker();
-    }
-  }
-
-  // ── Render settings UI ────────────────────────────────────────────────────
-  function renderSettingsUI(containerId) {
-    var container = document.getElementById(containerId);
-    if (!container) return;
-
-    var settings = load();
-    var permStatus = !('Notification' in window) ? 'not-supported'
-      : Notification.permission === 'granted' ? 'granted'
-      : Notification.permission === 'denied' ? 'denied' : 'default';
-
-    container.innerHTML =
-      '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:1.2rem;margin-bottom:1rem;">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">' +
-          '<div>' +
-            '<div style="font-family:var(--fh);font-size:15px;font-weight:700;">🔔 Daily Study Reminder</div>' +
-            '<div style="font-size:12px;color:var(--muted);margin-top:2px;">Get reminded to study every day</div>' +
-          '</div>' +
-          '<label class="tog">' +
-            '<input type="checkbox" id="reminder-toggle" ' + (settings.enabled ? 'checked' : '') + '>' +
-            '<span class="tog-sl"></span>' +
-          '</label>' +
-        '</div>' +
-
-        '<div id="reminder-time-row" style="' + (!settings.enabled ? 'display:none;' : '') + 'margin-bottom:1rem;">' +
-          '<label class="fl">Reminder Time</label>' +
-          '<input type="time" id="reminder-time" value="' + settings.time + '" style="max-width:160px;">' +
-        '</div>' +
-
-        '<div id="reminder-status" style="font-size:12px;margin-top:8px;">' +
-          (permStatus === 'denied'
-            ? '<span style="color:#ce1126;">⚠️ Notifications blocked. Please enable in browser settings.</span>'
-            : permStatus === 'granted' && settings.enabled
-            ? '<span style="color:#006b3f;">✅ Reminder set for ' + settings.time + ' daily</span>'
-            : '') +
-        '</div>' +
-      '</div>';
-
-    // Wire up toggle
-    var toggle = document.getElementById('reminder-toggle');
-    var timeRow = document.getElementById('reminder-time-row');
-    var timeInput = document.getElementById('reminder-time');
-    var statusEl = document.getElementById('reminder-status');
-
-    toggle.addEventListener('change', function() {
-      if (toggle.checked) {
-        timeRow.style.display = 'block';
-        var chosenTime = timeInput.value || '19:00';
-        enable(chosenTime, function(ok, err) {
-          if (ok) {
-            statusEl.innerHTML = '<span style="color:#006b3f;">✅ Reminder set for ' + chosenTime + ' daily</span>';
-          } else {
-            statusEl.innerHTML = '<span style="color:#ce1126;">⚠️ ' + (err || 'Could not enable.') + '</span>';
-            toggle.checked = false;
-            timeRow.style.display = 'none';
-          }
-        });
-      } else {
-        disable();
-        timeRow.style.display = 'none';
-        statusEl.innerHTML = '<span style="color:var(--muted);">Reminder off</span>';
-      }
-    });
-
-    timeInput.addEventListener('change', function() {
-      if (toggle.checked) {
-        var newTime = timeInput.value;
-        var s = load();
-        s.time = newTime;
-        save(s);
-        syncWithSW(newTime, null);
-        statusEl.innerHTML = '<span style="color:#006b3f;">✅ Reminder updated to ' + newTime + ' daily</span>';
-      }
-    });
-  }
-
-  return { init: init, enable: enable, disable: disable, load: load, renderSettingsUI: renderSettingsUI };
-
-})();
-
-// Auto-init
-document.addEventListener('DOMContentLoaded', function() {
-  NyansaReminder.init();
+    })
+  );
 });
