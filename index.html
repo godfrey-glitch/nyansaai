@@ -32,6 +32,19 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBhwkBfgVtakP26MHMaI_BckBT5hSXxH2s",
+  authDomain: "nyansa-ai-9498a.firebaseapp.com",
+  projectId: "nyansa-ai-9498a",
+  storageBucket: "nyansa-ai-9498a.firebasestorage.app",
+  messagingSenderId: "788688078262",
+  appId: "1:788688078262:web:f23bf8fef169208b88ad17"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+</script>
 <script src="app.js" defer></script>
 <script src="reminder.js" defer></script>
 <script>
