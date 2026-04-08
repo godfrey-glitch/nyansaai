@@ -1,17 +1,3 @@
-// ── Firebase Setup ──────────────────────────────────────────────
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-// ────────────────────────────────────────────────────────────────
-
 (function(){
 var _dismissed=false;
 function dismissLoader(){
@@ -228,34 +214,95 @@ function showErr(m){const e=document.getElementById('auth-err');e.textContent=m;
 function showOk(m){const e=document.getElementById('auth-ok');e.textContent=m;e.style.display='';}
 function selectRole(r,btn){selectedRole=r;document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');}
 function checkPw(pw){let s=0;if(pw.length>=6)s++;if(pw.length>=10)s++;if(/[A-Z0-9]/.test(pw))s++;if(/[^A-Za-z0-9]/.test(pw))s++;const c=['#ce1126','#e6a800','#ffd200','#006b3f'];['pb1','pb2','pb3','pb4'].forEach((id,i)=>{document.getElementById(id).style.background=i<s?c[s-1]:'';});}
-async function handleSignup(){
+function handleSignup(){
   const name=document.getElementById('su-name').value.trim();
   const email=document.getElementById('su-email').value.trim().toLowerCase();
   const pw=document.getElementById('su-pw').value;
   const confirm=document.getElementById('su-confirm').value;
+  const school=document.getElementById('su-school').value.trim();
   if(!name){showErr('Please enter your full name.');return;}
   if(!email.includes('@')){showErr('Please enter a valid email.');return;}
   if(pw.length<6){showErr('Password must be at least 6 characters.');return;}
   if(pw!==confirm){showErr('Passwords do not match.');return;}
-  try{
-    const result=await auth.createUserWithEmailAndPassword(email,pw);
-    const user={name,email,school:document.getElementById('su-school').value.trim(),role:selectedRole,avatar:name.slice(0,2).toUpperCase(),uid:result.user.uid,createdAt:new Date().toISOString()};
-    await db.collection('users').doc(result.user.uid).set(user);
+
+  // Use Firebase Auth if available, fallback to localStorage
+  if(typeof firebase!=='undefined'&&firebase.auth){
+    const btn=document.querySelector('#signup-form .btn.bp');
+    if(btn){btn.disabled=true;btn.textContent='Creating account...';}
+    firebase.auth().createUserWithEmailAndPassword(email,pw)
+      .then(function(cred){
+        const user={name,email,school,role:selectedRole,avatar:name.slice(0,2).toUpperCase(),uid:cred.user.uid};
+        // Save to Firestore
+        return firebase.firestore().collection('users').doc(cred.user.uid).set({
+          displayName:name,email,school,role:selectedRole,
+          uid:cred.user.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+          lastActive:firebase.firestore.FieldValue.serverTimestamp(),
+          quizzesTaken:0,totalScore:0,streakDays:0,ageGroup:''
+        }).then(function(){return user;});
+      })
+      .then(function(user){
+        currentUser=user;saveSession(user);
+        showOk('Account created! 🎉');
+        setTimeout(()=>{applySession();goPage('home');confetti();toast('Welcome, '+name.split(' ')[0]+'! 🇬🇭','🎓','green',4000);},900);
+      })
+      .catch(function(err){
+        if(btn){btn.disabled=false;btn.textContent='Create My Account';}
+        const msg=err.code==='auth/email-already-in-use'?'Email already registered.':
+                   err.code==='auth/weak-password'?'Password too weak.':err.message;
+        showErr(msg);
+      });
+  } else {
+    // Fallback: localStorage
+    const users=getUsers();if(users[email]){showErr('Email already registered.');return;}
+    const user={name,email,school,role:selectedRole,avatar:name.slice(0,2).toUpperCase()};
+    users[email]={...user,pw:btoa(pw)};localStorage.setItem('em_u',JSON.stringify(users));
     saveSession(user);currentUser=user;showOk('Account created! 🎉');
     setTimeout(()=>{applySession();goPage('home');confetti();toast('Welcome, '+name.split(' ')[0]+'! 🇬🇭','🎓','green',4000);},900);
-  }catch(e){showErr(e.message);}
+  }
 }
-async function handleLogin(){
+function handleLogin(){
   const email=document.getElementById('li-email').value.trim().toLowerCase();
   const pw=document.getElementById('li-pw').value;
   if(!email||!pw){showErr('Please fill in both fields.');return;}
-  try{
-    const result=await auth.signInWithEmailAndPassword(email,pw);
-    const snap=await db.collection('users').doc(result.user.uid).get();
-    const user=snap.exists?snap.data():{name:email,email,role:'student',avatar:email.slice(0,2).toUpperCase()};
-    currentUser=user;saveSession(user);applySession();goPage('home');
-    toast('Welcome back, '+user.name.split(' ')[0]+'! 🇬🇭','👋','gold',3000);
-  }catch(e){showErr('Incorrect email or password.');}
+
+  if(typeof firebase!=='undefined'&&firebase.auth){
+    const btn=document.querySelector('#login-form .btn.bp');
+    if(btn){btn.disabled=true;btn.textContent='Signing in...';}
+    firebase.auth().signInWithEmailAndPassword(email,pw)
+      .then(function(cred){
+        return firebase.firestore().collection('users').doc(cred.user.uid).get()
+          .then(function(doc){
+            const data=doc.exists?doc.data():{};
+            const user={
+              name:data.displayName||email.split('@')[0],
+              email,school:data.school||'',
+              role:data.role||'student',
+              avatar:(data.displayName||email).slice(0,2).toUpperCase(),
+              uid:cred.user.uid
+            };
+            // Update last active
+            firebase.firestore().collection('users').doc(cred.user.uid).update({
+              lastActive:firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(function(){});
+            return user;
+          });
+      })
+      .then(function(user){
+        currentUser=user;saveSession(user);applySession();goPage('home');
+        toast('Welcome back, '+user.name.split(' ')[0]+'! 🇬🇭','👋','gold',3000);
+      })
+      .catch(function(err){
+        if(btn){btn.disabled=false;btn.textContent='Sign In';}
+        const msg=err.code==='auth/user-not-found'||err.code==='auth/wrong-password'?'Incorrect email or password.':
+                   err.code==='auth/too-many-requests'?'Too many attempts. Please try again later.':err.message;
+        showErr(msg);
+      });
+  } else {
+    const users=getUsers();const user=users[email];
+    if(!user||user.pw!==btoa(pw)){showErr('Incorrect email or password.');return;}
+    const {pw:_,...safe}=user;currentUser=safe;saveSession(safe);applySession();goPage('home');
+    toast('Welcome back, '+safe.name.split(' ')[0]+'! 🇬🇭','👋','gold',3000);
+  }
 }
 function demoLogin(role){
   const names={student:'Kwame Asante',teacher:'Ms. Abena Boateng'};
@@ -272,9 +319,11 @@ function applySession(){
   state.prefs.name=currentUser.name;
   state.prefs.school=currentUser.school||'';
 }
-async function handleLogout(){
+function handleLogout(){
   if(!confirm('Sign out of Nyansa AI?'))return;
-  await auth.signOut();
+  if(typeof firebase!=='undefined'&&firebase.auth){
+    firebase.auth().signOut().catch(function(){});
+  }
   localStorage.removeItem('em_s');currentUser=null;
   document.querySelectorAll('.page').forEach(p=>p.style.display='none');
   document.getElementById('pg-auth').style.display='flex';
