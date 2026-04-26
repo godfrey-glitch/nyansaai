@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nyansa AI">
+<meta name="application-name" content="Nyansa AI">
+<meta name="theme-color" content="#d4960a">
+<meta name="description" content="Powered by Wisdom — Ghana's learning platform for ages 4-18.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Nyansa AI — Powered by Wisdom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="styles.css">
+
+
+
+
+
+</head>
+<body>
+
+<!-- ═══ NYANSA ONBOARDING OVERLAY ═══ -->
+<style>
+#onboarding-overlay {
+  position: fixed; inset: 0; z-index: 99990;
+  overflow-y: auto; background: #080c10;
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 60px 20px 40px;
+  font-family: 'DM Sans', sans-serif;
+}
+#onboarding-overlay * { box-sizing: border-box; margin: 0; padding: 0; }
+#onboarding-overlay .ob-flag-bar { position: fixed; top:0; left:0; right:0; height:4px; display:flex; z-index:100; }
+#onboarding-overlay .ob-flag-bar .r { flex:1; background:#ce1126; }
+#onboarding-overlay .ob-flag-bar .y { flex:1; background:#fcd116; }
+#onboarding-overlay .ob-flag-bar .g { flex:1; background:#006b3f; }
+#onboarding-overlay .ob-logo { display:flex; align-items:center; gap:12px; margin-bottom:48px; }
+#onboarding-overlay .ob-logo-shield { width:44px; height:44px; background:#fcd116; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:800; font-size:20px; color:#080c10; box-shadow:0 0 20px rgba(252,209,22,0.4); }
+#onboarding-overlay .ob-logo-name { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:#fff; }
+#onboarding-overlay .ob-logo-name span { color:#fcd116; }
+#onboarding-overlay .ob-logo-sub { font-size:11px; color:rgba(255,255,255,0.3); margin-top:2px; }
+#onboarding-overlay .ob-progress { display:flex; gap:8px; margin-bottom:40px; }
+#onboarding-overlay .ob-dot { width:8px; height:8px; border-radius:4px; background:rgba(255,255,255,0.08); transition:all .3s; }
+#onboarding-overlay .ob-dot.active { width:28px; background:#fcd116; box-shadow:0 0 10px rgba(252,209,22,0.4); }
+#onboarding-overlay .ob-dot.done { background:#4caf82; }
+#onboarding-overlay .ob-step { display:none; flex-direction:column; align-items:center; width:100%; max-width:520px; }
+#onboarding-overlay .ob-step.active { display:flex; }
+#onboarding-overlay .ob-emoji { font-size:48px; margin-bottom:16px; filter:drop-shadow(0 0 20px rgba(252,209,22,0.3)); }
+#onboarding-overlay .ob-title { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; text-align:center; color:#fff; line-height:1.2; margin-bottom:10px; }
+#onboarding-overlay .ob-title span { color:#fcd116; }
+#onboarding-overlay .ob-sub { font-size:14px; color:rgba(255,255,255,0.55); text-align:center; line-height:1.7; margin-bottom:36px; max-width:380px; }
+#onboarding-overlay .ob-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; width:100%; margin-bottom:32px; }
+#onboarding-overlay .ob-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:18px 14px; cursor:pointer; transition:all .25s; text-align:center; position:relative; }
+#onboarding-overlay .ob-card:hover { border-color:rgba(252,209,22,0.25); transform:translateY(-2px); }
+#onboarding-overlay .ob-card.selected { border-color:#fcd116; background:rgba(252,209,22,0.15); box-shadow:0 0 20px rgba(252,209,22,0.15); }
+#onboarding-overlay .ob-check { position:absolute; top:10px; right:10px; width:20px; height:20px; background:#fcd116; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; color:#080c10; font-weight:800; opacity:0; transform:scale(0.5); transition:all .2s; }
+#onboarding-overlay .ob-card.selected .ob-check { opacity:1; transform:scale(1); }
+#onboarding-overlay .ob-opt-icon { font-size:28px; margin-bottom:8px; display:block; }
+#onboarding-overlay .ob-opt-label { font-size:13px; font-weight:600; color:#fff; display:block; margin-bottom:3px; }
+#onboarding-overlay .ob-opt-desc { font-size:11px; color:rgba(255,255,255,0.3); display:block; line-height:1.4; }
+#onboarding-overlay .ob-class-scroll { width:100%; display:flex; flex-direction:column; gap:8px; max-height:320px; overflow-y:auto; padding-right:6px; margin-bottom:32px; scrollbar-width:thin; scrollbar-color:rgba(252,209,22,0.25) transparent; }
+#onboarding-overlay .ob-group-label { font-size:10px; font-weight:700; letter-spacing:1.5px; color:rgba(255,255,255,0.3); text-transform:uppercase; padding:8px 0 4px; }
+#onboarding-overlay .ob-class-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+#onboarding-overlay .ob-pill { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px 8px; text-align:center; cursor:pointer; transition:all .2s; font-size:12px; font-weight:500; color:rgba(255,255,255,0.55); }
+#onboarding-overlay .ob-pill:hover { border-color:rgba(252,209,22,0.25); color:#fff; }
+#onboarding-overlay .ob-pill.selected { background:rgba(252,209,22,0.15); border-color:#fcd116; color:#fcd116; font-weight:700; }
+#onboarding-overlay .ob-goals { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:32px; width:100%; }
+#onboarding-overlay .ob-goal { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:24px; padding:10px 18px; cursor:pointer; font-size:13px; font-weight:500; color:rgba(255,255,255,0.55); transition:all .2s; }
+#onboarding-overlay .ob-goal:hover { border-color:rgba(252,209,22,0.25); color:#fff; }
+#onboarding-overlay .ob-goal.selected { background:rgba(252,209,22,0.15); border-color:#fcd116; color:#fcd116; font-weight:600; }
+#onboarding-overlay .ob-btn { background:#fcd116; color:#080c10; border:none; border-radius:14px; padding:16px 40px; font-family:'Syne',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all .25s; width:100%; max-width:360px; box-shadow:0 4px 30px rgba(252,209,22,0.3); }
+#onboarding-overlay .ob-btn:hover { transform:translateY(-2px); box-shadow:0 8px 40px rgba(252,209,22,0.4); }
+#onboarding-overlay .ob-btn:disabled { opacity:.35; cursor:not-allowed; transform:none; box-shadow:none; }
+#onboarding-overlay .ob-skip { margin-top:16px; font-size:12px; color:rgba(255,255,255,0.3); cursor:pointer; }
+#onboarding-overlay .ob-skip:hover { color:rgba(255,255,255,0.55); }
+#onboarding-overlay .ob-success-ring { width:80px; height:80px; border-radius:50%; background:rgba(252,209,22,0.15); border:2px solid #fcd116; display:flex; align-items:center; justify-content:center; font-size:36px; margin-bottom:20px; animation: ob-pulse 2s ease infinite; }
+@keyframes ob-pulse { 0%,100% { box-shadow:0 0 40px rgba(252,209,22,.2); } 50% { box-shadow:0 0 60px rgba(252,209,22,.4); } }
+@keyframes ob-fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+</style>
+
+<div id="onboarding-overlay">
+  <div class="ob-flag-bar"><div class="r"></div><div class="y"></div><div class="g"></div></div>
+  <div class="ob-logo">
+    <div class="ob-logo-shield">N</div>
+    <div><div class="ob-logo-name">NYANSA <span>AI</span></div><div class="ob-logo-sub">Powered by Wisdom 🇬🇭</div></div>
+  </div>
+  <div class="ob-progress">
+    <div class="ob-dot active" id="ob-dot-1"></div>
+    <div class="ob-dot" id="ob-dot-2"></div>
+    <div class="ob-dot" id="ob-dot-3"></div>
+  </div>
+
+  <!-- Step 1: Role -->
+  <div class="ob-step active" id="ob-step-1">
+    <div class="ob-emoji">👋</div>
+    <div class="ob-title">Welcome to <span>Nyansa AI</span></div>
+    <div class="ob-sub">Ghana's free AI learning platform. Let's personalise your experience. Who are you?</div>
+    <div class="ob-grid">
+      <div class="ob-card" onclick="obSelectRole(this,'student')"><div class="ob-check">✓</div><span class="ob-opt-icon">🎓</span><span class="ob-opt-label">Student</span><span class="ob-opt-desc">Basic, JHS, or SHS learner</span></div>
+      <div class="ob-card" onclick="obSelectRole(this,'parent')"><div class="ob-check">✓</div><span class="ob-opt-icon">👨‍👩‍👧</span><span class="ob-opt-label">Parent</span><span class="ob-opt-desc">Monitor my child's progress</span></div>
+      <div class="ob-card" onclick="obSelectRole(this,'teacher')"><div class="ob-check">✓</div><span class="ob-opt-icon">👩‍🏫</span><span class="ob-opt-label">Teacher</span><span class="ob-opt-desc">Manage students & quizzes</span></div>
+      <div class="ob-card" onclick="obSelectRole(this,'university')"><div class="ob-check">✓</div><span class="ob-opt-icon">🏛️</span><span class="ob-opt-label">University Student</span><span class="ob-opt-desc">Tertiary level learner</span></div>
+    </div>
+    <button class="ob-btn" id="ob-btn-1" onclick="obGoStep(2)" disabled>Continue →</button>
+    <div class="ob-skip" onclick="obGoStep(2)">Skip personalisation</div>
+  </div>
+
+  <!-- Step 2: Class level -->
+  <div class="ob-step" id="ob-step-2">
+    <div class="ob-emoji">📚</div>
+    <div class="ob-title">What <span>level</span> are you?</div>
+    <div class="ob-sub">We'll tailor your quizzes, AI tutor, and study plan to match your class.</div>
+    <div class="ob-class-scroll">
+      <div class="ob-group-label">🌱 Primary School</div>
+      <div class="ob-class-row">
+        <div class="ob-pill" onclick="obSelectClass(this,'Basic 1')">Basic 1</div>
+        <div class="ob-pill" onclick="obSelectClass(this,'Basic 2')">Basic 2</div>
+        <div class="ob-pill" onclick="obSelectClass(this,'Basic 3')">Basic 3</div>
+        <div class="ob-pill" onclick="obSelectClass(this,'Basic 4')">Basic 4</div>
+        <div class="ob-pill" onclick="obSelectClass(this,'Basic 5')">Basic 5</div>
+        <div class="ob-pill" onclick="obSelectClass(this,'Basic 6')">Basic 6</div>
+      </div>
+      <div class="ob-group-label">📖 Junior High School</div>
+      <div class="ob-class-row">
+        <div class="ob-pill" onclick="obSelectClass(this,'JHS 1')">JHS 1</div>
+        <div class="ob-pill" onclick="obSelectClass(this,'JHS 2')">JHS 2</div>
+        <div class="ob-pill" onclick="obSelectClass(this,'JHS 3 (BECE)')">JHS 3 · BECE</div>
+      </div>
+      <div class="ob-group-label">🎓 Senior High School</div>
+      <div class="ob-class-row">
+        <div class="ob-pill" onclick="obSelectClass(this,'SHS 1')">SHS 1</div>
+        <div class="ob-pill" onclick="obSelectClass(this,'SHS 2')">SHS 2</div>
+        <div class="ob-pill" onclick="obSelectClass(this,'SHS 3 (WASSCE)')">SHS 3 · WASSCE</div>
+      </div>
+      <div class="ob-group-label">🏛️ University / Other</div>
+      <div class="ob-class-row">
+        <div class="ob-pill" onclick="obSelectClass(this,'University')">University</div>
+        <div class="ob-pill" onclick="obSelectClass(this,'Nursery / KG')">Nursery / KG</div>
+      </div>
+    </div>
+    <button class="ob-btn" id="ob-btn-2" onclick="obGoStep(3)" disabled>Continue →</button>
+    <div class="ob-skip" onclick="obGoStep(3)">Skip for now</div>
+  </div>
+
+  <!-- Step 3: Goal -->
+  <div class="ob-step" id="ob-step-3">
+    <div class="ob-emoji">🎯</div>
+    <div class="ob-title">What's your <span>main goal?</span></div>
+    <div class="ob-sub">Pick one — we'll build your personalised dashboard around it.</div>
+    <div class="ob-goals">
+      <div class="ob-goal" onclick="obSelectGoal(this,'wassce')">🏆 Prepare for WASSCE</div>
+      <div class="ob-goal" onclick="obSelectGoal(this,'bece')">📝 Prepare for BECE</div>
+      <div class="ob-goal" onclick="obSelectGoal(this,'general')">📚 General Learning</div>
+      <div class="ob-goal" onclick="obSelectGoal(this,'university')">🏛️ University Studies</div>
+      <div class="ob-goal" onclick="obSelectGoal(this,'kids')">⭐ Kids Learning</div>
+      <div class="ob-goal" onclick="obSelectGoal(this,'teacher')">👩‍🏫 Manage My Students</div>
+      <div class="ob-goal" onclick="obSelectGoal(this,'parent')">👨‍👩‍👧 Monitor My Child</div>
+    </div>
+    <button class="ob-btn" id="ob-btn-3" onclick="obFinish()" disabled>🚀 Start Learning</button>
+    <div class="ob-skip" onclick="obFinish()">Go to dashboard</div>
+  </div>
+
+  <!-- Step 4: Done -->
+  <div class="ob-step" id="ob-step-4">
+    <div class="ob-success-ring">🎉</div>
+    <div class="ob-title">You're all set!</div>
+    <div class="ob-sub">Your personalised Nyansa AI dashboard is ready. Let's start learning! 🇬🇭</div>
+    <button class="ob-btn" onclick="obClose()">Enter Nyansa AI →</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var _obRole=null, _obClass=null, _obGoal=null, _obStep=1;
+  function obShow(){
+    try { if(localStorage.getItem('nyansa_onboarded')==='true') return; } catch(e){}
+    var el=document.getElementById('onboarding-overlay');
+    if(el){ el.style.display='flex'; }
+  }
+  window.obSelectRole=function(el,role){
+    document.querySelectorAll('#ob-step-1 .ob-card').forEach(function(c){c.classList.remove('selected');});
+    el.classList.add('selected'); _obRole=role;
+    document.getElementById('ob-btn-1').disabled=false;
+    if(role==='parent'||role==='teacher') _obClass=role==='parent'?'Parent':'Teacher';
+  };
+  window.obSelectClass=function(el,cls){
+    document.querySelectorAll('.ob-pill').forEach(function(c){c.classList.remove('selected');});
+    el.classList.add('selected'); _obClass=cls;
+    document.getElementById('ob-btn-2').disabled=false;
+  };
+  window.obSelectGoal=function(el,goal){
+    document.querySelectorAll('.ob-goal').forEach(function(t){t.classList.remove('selected');});
+    el.classList.add('selected'); _obGoal=goal;
+    document.getElementById('ob-btn-3').disabled=false;
+  };
+  window.obGoStep=function(n){
+    document.getElementById('ob-step-'+_obStep).classList.remove('active');
+    _obStep=n;
+    document.getElementById('ob-step-'+n).classList.add('active');
+    for(var i=1;i<=3;i++){
+      var dot=document.getElementById('ob-dot-'+i);
+      dot.className='ob-dot';
+      if(i<n) dot.classList.add('done');
+      else if(i===n) dot.classList.add('active');
+    }
+    if(n===2&&(_obRole==='parent'||_obRole==='teacher')) obGoStep(3);
+  };
+  window.obFinish=function(){
+    document.getElementById('ob-step-3').classList.remove('active');
+    document.getElementById('ob-step-4').classList.add('active');
+    document.querySelector('.ob-progress').style.display='none';
+  };
+  window.obClose=function(){
+    try {
+      localStorage.setItem('nyansa_onboarded','true');
+      if(_obRole) localStorage.setItem('nyansa_role',_obRole);
+      if(_obClass) localStorage.setItem('nyansa_class',_obClass);
+      if(_obGoal) localStorage.setItem('nyansa_goal',_obGoal);
+    } catch(e){}
+    var el=document.getElementById('onboarding-overlay');
+    if(el){ el.style.opacity='0'; el.style.transition='opacity .4s'; setTimeout(function(){ el.style.display='none'; el.style.opacity='1'; },400); }
+    // Personalise dashboard based on goal
+    if(_obGoal==='kids'){ if(typeof enterKidsMode==='function') setTimeout(enterKidsMode,500); }
+  };
+  // Show after auth success — hook into existing auth
+  document.addEventListener('DOMContentLoaded', function(){
+    // Wait for auth state, then check
+    setTimeout(function(){
+      try { if(localStorage.getItem('nyansa_onboarded')!=='true') obShow(); } catch(e){ obShow(); }
+    }, 2000);
+  });
+})();
+</script>
+<!-- ═══ END ONBOARDING OVERLAY ═══ -->
+
+<div id="app-loader" style="position:fixed;inset:0;z-index:99999;background:#fffbf2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;">
+<div style="font-family:'Syne',system-ui,sans-serif;font-size:2.4rem;font-weight:800;letter-spacing:-1.5px;">Nyansa<span style="color:#d4960a;"> AI</span></div>
+<div style="font-size:13px;color:#7a5c20;">Powered by Wisdom</div>
+<div style="width:48px;height:4px;background:#fff3cc;border-radius:99px;margin-top:.5rem;overflow:hidden;"><div id="loader-bar" style="height:4px;background:#d4960a;border-radius:99px;width:0%;transition:width .4s ease;"></div></div>
+</div>
+
+<!-- ═══════ ONBOARDING OVERLAY (shown once on first visit) ═══════ -->
+<style>
+#onboarding-overlay{position:fixed;inset:0;z-index:9998;overflow-y:auto;background:#080c10;display:none;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px 40px;}
+#onboarding-overlay .flag-bar{position:fixed;top:0;left:0;right:0;height:4px;display:flex;z-index:100;}
+#onboarding-overlay .flag-bar div{flex:1;}
+#onboarding-overlay .flag-r{background:#ce1126;}
+#onboarding-overlay .flag-y{background:#fcd116;}
+#onboarding-overlay .flag-g{background:#006b3f;}
+#onboarding-overlay .ob-ambient{position:fixed;inset:0;pointer-events:none;z-index:0;}
+#onboarding-overlay .ob-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.12;}
+#onboarding-overlay .ob-orb-1{width:500px;height:500px;background:#fcd116;top:-200px;right:-100px;}
+#onboarding-overlay .ob-orb-2{width:400px;height:400px;background:#006b3f;bottom:-150px;left:-100px;}
+#onboarding-overlay .ob-inner{position:relative;z-index:10;width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;}
+#onboarding-overlay .ob-logo{display:flex;align-items:center;gap:12px;margin-bottom:48px;}
+#onboarding-overlay .ob-shield{width:44px;height:44px;background:#fcd116;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#080c10;box-shadow:0 0 20px rgba(252,209,22,.4);}
+#onboarding-overlay .ob-logo-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;}
+#onboarding-overlay .ob-logo-name span{color:#fcd116;}
+#onboarding-overlay .ob-logo-sub{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px;}
+#onboarding-overlay .ob-progress{display:flex;gap:8px;margin-bottom:40px;}
+#onboarding-overlay .ob-dot{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.08);transition:all .3s;}
+#onboarding-overlay .ob-dot.active{width:28px;background:#fcd116;box-shadow:0 0 10px rgba(252,209,22,.4);}
+#onboarding-overlay .ob-dot.done{background:#4caf82;}
+#onboarding-overlay .ob-step{display:none;flex-direction:column;align-items:center;width:100%;}
+#onboarding-overlay .ob-step.active{display:flex;animation:obFadeUp .5s ease both;}
+#onboarding-overlay .ob-emoji{font-size:48px;margin-bottom:16px;}
+#onboarding-overlay .ob-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;text-align:center;color:#fff;margin-bottom:10px;}
+#onboarding-overlay .ob-title span{color:#fcd116;}
+#onboarding-overlay .ob-sub{font-size:14px;color:rgba(255,255,255,.55);text-align:center;line-height:1.7;margin-bottom:36px;max-width:380px;}
+#onboarding-overlay .ob-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;margin-bottom:32px;}
+#onboarding-overlay .ob-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px 14px;cursor:pointer;transition:all .25s;text-align:center;position:relative;}
+#onboarding-overlay .ob-card:hover{border-color:rgba(252,209,22,.25);transform:translateY(-2px);}
+#onboarding-overlay .ob-card.selected{border-color:#fcd116;background:rgba(252,209,22,.15);box-shadow:0 0 20px rgba(252,209,22,.15);}
+#onboarding-overlay .ob-check{position:absolute;top:10px;right:10px;width:20px;height:20px;background:#fcd116;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:#080c10;font-weight:800;opacity:0;transform:scale(.5);transition:all .2s;}
+#onboarding-overlay .ob-card.selected .ob-check{opacity:1;transform:scale(1);}
+#onboarding-overlay .ob-card-icon{font-size:28px;margin-bottom:8px;display:block;}
+#onboarding-overlay .ob-card-label{font-size:13px;font-weight:600;color:#fff;display:block;margin-bottom:3px;}
+#onboarding-overlay .ob-card-desc{font-size:11px;color:rgba(255,255,255,.3);display:block;}
+#onboarding-overlay .ob-class-scroll{width:100%;display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto;padding-right:6px;margin-bottom:32px;scrollbar-width:thin;scrollbar-color:rgba(252,209,22,.25) transparent;}
+#onboarding-overlay .ob-group-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.3);text-transform:uppercase;padding:8px 0 4px;}
+#onboarding-overlay .ob-class-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+#onboarding-overlay .ob-pill{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .2s;font-size:12px;font-weight:500;color:rgba(255,255,255,.55);}
+#onboarding-overlay .ob-pill:hover{border-color:rgba(252,209,22,.25);color:#fff;}
+#onboarding-overlay .ob-pill.selected{background:rgba(252,209,22,.15);border-color:#fcd116;color:#fcd116;font-weight:700;}
+#onboarding-overlay .ob-goals{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:32px;width:100%;}
+#onboarding-overlay .ob-goal{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:10px 18px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.55);transition:all .2s;}
+#onboarding-overlay .ob-goal:hover{border-color:rgba(252,209,22,.25);color:#fff;}
+#onboarding-overlay .ob-goal.selected{background:rgba(252,209,22,.15);border-color:#fcd116;color:#fcd116;font-weight:600;}
+#onboarding-overlay .ob-btn{background:#fcd116;color:#080c10;border:none;border-radius:14px;padding:16px 40px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .25s;width:100%;max-width:360px;box-shadow:0 4px 30px rgba(252,209,22,.3);}
+#onboarding-overlay .ob-btn:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(252,209,22,.4);}
+#onboarding-overlay .ob-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none;}
+#onboarding-overlay .ob-skip{margin-top:16px;font-size:12px;color:rgba(255,255,255,.3);cursor:pointer;transition:color .2s;}
+#onboarding-overlay .ob-skip:hover{color:rgba(255,255,255,.55);}
+@keyframes obFadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+</style>
+
+<div id="onboarding-overlay">
+  <div class="flag-bar"><div class="flag-r"></div><div class="flag-y"></div><div class="flag-g"></div></div>
+  <div class="ob-ambient"><div class="ob-orb ob-orb-1"></div><div class="ob-orb ob-orb-2"></div></div>
+  <div class="ob-inner">
+    <div class="ob-logo">
+      <div class="ob-shield">N</div>
+      <div><div class="ob-logo-name">NYANSA <span>AI</span></div><div class="ob-logo-sub">Powered by Wisdom 🇬🇭</div></div>
+    </div>
+    <div class="ob-progress">
+      <div class="ob-dot active" id="ob-dot-1"></div>
+      <div class="ob-dot" id="ob-dot-2"></div>
+      <div class="ob-dot" id="ob-dot-3"></div>
+    </div>
+    <!-- Step 1: Role -->
+    <div class="ob-step active" id="ob-step-1">
+      <div class="ob-emoji">👋</div>
+      <div class="ob-title">Welcome to <span>Nyansa AI</span></div>
+      <div class="ob-sub">Ghana's free AI learning platform. Let's personalise your experience. Who are you?</div>
+      <div class="ob-grid">
+        <div class="ob-card" onclick="obSelectRole(this,'student')"><div class="ob-check">✓</div><span class="ob-card-icon">🎓</span><span class="ob-card-label">Student</span><span class="ob-card-desc">Basic, JHS, or SHS learner</span></div>
+        <div class="ob-card" onclick="obSelectRole(this,'parent')"><div class="ob-check">✓</div><span class="ob-card-icon">👨‍👩‍👧</span><span class="ob-card-label">Parent</span><span class="ob-card-desc">Monitor my child's progress</span></div>
+        <div class="ob-card" onclick="obSelectRole(this,'teacher')"><div class="ob-check">✓</div><span class="ob-card-icon">👩‍🏫</span><span class="ob-card-label">Teacher</span><span class="ob-card-desc">Manage students & quizzes</span></div>
+        <div class="ob-card" onclick="obSelectRole(this,'university')"><div class="ob-check">✓</div><span class="ob-card-icon">🏛️</span><span class="ob-card-label">University Student</span><span class="ob-card-desc">Tertiary level learner</span></div>
+      </div>
+      <button class="ob-btn" id="ob-btn-1" onclick="obGoStep(2)" disabled>Continue →</button>
+      <div class="ob-skip" onclick="obGoStep(2)">Skip personalisation</div>
+    </div>
+    <!-- Step 2: Class Level -->
+    <div class="ob-step" id="ob-step-2">
+      <div class="ob-emoji">📚</div>
+      <div class="ob-title">What <span>level</span> are you?</div>
+      <div class="ob-sub">We'll tailor quizzes, AI tutor, and study plan to match your class.</div>
+      <div class="ob-class-scroll">
+        <div class="ob-group-lbl">🌱 Primary School</div>
+        <div class="ob-class-row">
+          <div class="ob-pill" onclick="obSelectClass(this,'Basic 1')">Basic 1</div>
+          <div class="ob-pill" onclick="obSelectClass(this,'Basic 2')">Basic 2</div>
+          <div class="ob-pill" onclick="obSelectClass(this,'Basic 3')">Basic 3</div>
+          <div class="ob-pill" onclick="obSelectClass(this,'Basic 4')">Basic 4</div>
+          <div class="ob-pill" onclick="obSelectClass(this,'Basic 5')">Basic 5</div>
+          <div class="ob-pill" onclick="obSelectClass(this,'Basic 6')">Basic 6</div>
+        </div>
+        <div class="ob-group-lbl">📖 Junior High School</div>
+        <div class="ob-class-row">
+          <div class="ob-pill" onclick="obSelectClass(this,'JHS 1')">JHS 1</div>
+          <div class="ob-pill" onclick="obSelectClass(this,'JHS 2')">JHS 2</div>
+          <div class="ob-pill" onclick="obSelectClass(this,'JHS 3 (BECE)')">JHS 3 · BECE</div>
+        </div>
+        <div class="ob-group-lbl">🎓 Senior High School</div>
+        <div class="ob-class-row">
+          <div class="ob-pill" onclick="obSelectClass(this,'SHS 1')">SHS 1</div>
+          <div class="ob-pill" onclick="obSelectClass(this,'SHS 2')">SHS 2</div>
+          <div class="ob-pill" onclick="obSelectClass(this,'SHS 3 (WASSCE)')">SHS 3 · WASSCE</div>
+        </div>
+        <div class="ob-group-lbl">🏛️ University / Other</div>
+        <div class="ob-class-row">
+          <div class="ob-pill" onclick="obSelectClass(this,'University')">University</div>
+          <div class="ob-pill" onclick="obSelectClass(this,'Nursery / KG')">Nursery / KG</div>
+        </div>
+      </div>
+      <button class="ob-btn" id="ob-btn-2" onclick="obGoStep(3)" disabled>Continue →</button>
+      <div class="ob-skip" onclick="obGoStep(3)">Skip for now</div>
+    </div>
+    <!-- Step 3: Goal -->
+    <div class="ob-step" id="ob-step-3">
+      <div class="ob-emoji">🎯</div>
+      <div class="ob-title">What's your <span>main goal?</span></div>
+      <div class="ob-sub">Pick one — we'll build your personalised dashboard around it.</div>
+      <div class="ob-goals">
+        <div class="ob-goal" onclick="obSelectGoal(this,'wassce')">🏆 Prepare for WASSCE</div>
+        <div class="ob-goal" onclick="obSelectGoal(this,'bece')">📝 Prepare for BECE</div>
+        <div class="ob-goal" onclick="obSelectGoal(this,'general')">📚 General Learning</div>
+        <div class="ob-goal" onclick="obSelectGoal(this,'university')">🏛️ University Studies</div>
+        <div class="ob-goal" onclick="obSelectGoal(this,'kids')">⭐ Kids Learning</div>
+        <div class="ob-goal" onclick="obSelectGoal(this,'teacher')">👩‍🏫 Manage My Students</div>
+        <div class="ob-goal" onclick="obSelectGoal(this,'parent')">👨‍👩‍👧 Monitor My Child</div>
+      </div>
+      <button class="ob-btn" id="ob-btn-3" onclick="obFinish()" disabled>🚀 Start Learning</button>
+      <div class="ob-skip" onclick="obFinish()">Go to dashboard</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var obRole=null, obClass=null, obGoal=null, obStep=1;
+  function obShowOverlay(){
+    var el=document.getElementById('onboarding-overlay');
+    if(el) el.style.display='flex';
+  }
+  function obHideOverlay(){
+    var el=document.getElementById('onboarding-overlay');
+    if(el){ el.style.opacity='0'; el.style.transition='opacity .4s'; setTimeout(function(){ el.style.display='none'; el.style.opacity=''; }, 400); }
+  }
+  // Check if first visit
+  try {
+    if(localStorage.getItem('nyansa_onboarded')==='true'){
+      // Already onboarded, do not show
+    } else {
+      // Show after auth — wait for user to log in
+      document.addEventListener('nyansa-auth-ready', obShowOverlay);
+      // Also check after 2s if event not fired
+      setTimeout(function(){
+        if(!document.getElementById('pg-home').style.display || document.getElementById('pg-home').style.display==='none') return;
+        obShowOverlay();
+      }, 500);
+    }
+  } catch(e) {}
+
+  window.obSelectRole = function(el, role){
+    document.querySelectorAll('#ob-step-1 .ob-card').forEach(function(c){ c.classList.remove('selected'); });
+    el.classList.add('selected');
+    obRole = role;
+    document.getElementById('ob-btn-1').disabled = false;
+    if(role==='parent'||role==='teacher'){ obClass = role==='parent'?'Parent':'Teacher'; }
+  };
+  window.obSelectClass = function(el, cls){
+    document.querySelectorAll('.ob-pill').forEach(function(c){ c.classList.remove('selected'); });
+    el.classList.add('selected');
+    obClass = cls;
+    document.getElementById('ob-btn-2').disabled = false;
+  };
+  window.obSelectGoal = function(el, goal){
+    document.querySelectorAll('.ob-goal').forEach(function(t){ t.classList.remove('selected'); });
+    el.classList.add('selected');
+    obGoal = goal;
+    document.getElementById('ob-btn-3').disabled = false;
+  };
+  window.obGoStep = function(n){
+    document.getElementById('ob-step-'+obStep).classList.remove('active');
+    obStep = n;
+    document.getElementById('ob-step-'+n).classList.add('active');
+    for(var i=1;i<=3;i++){
+      var dot=document.getElementById('ob-dot-'+i);
+      dot.className='ob-dot';
+      if(i<n) dot.classList.add('done');
+      else if(i===n) dot.classList.add('active');
+    }
+    if(n===2 && (obRole==='parent'||obRole==='teacher')){ window.obGoStep(3); }
+  };
+  window.obFinish = function(){
+    try {
+      localStorage.setItem('nyansa_role', obRole||'student');
+      localStorage.setItem('nyansa_class', obClass||'');
+      localStorage.setItem('nyansa_goal', obGoal||'general');
+      localStorage.setItem('nyansa_onboarded', 'true');
+      // Pre-fill name pref age if class selected
+      if(obClass){
+        var classAgeMap={'Basic 1':7,'Basic 2':8,'Basic 3':9,'Basic 4':10,'Basic 5':11,'Basic 6':12,'JHS 1':13,'JHS 2':14,'JHS 3 (BECE)':15,'SHS 1':16,'SHS 2':17,'SHS 3 (WASSCE)':18};
+        if(classAgeMap[obClass]){
+          try{ var pAge=document.getElementById('pref-age'); if(pAge) pAge.value=String(classAgeMap[obClass]); }catch(e){}
+        }
+      }
+    } catch(e) {}
+    obHideOverlay();
+    // If kids goal, enter kids mode
+    if(obGoal==='kids' && typeof enterKidsMode==='function') setTimeout(enterKidsMode, 500);
+    if(obGoal==='teacher' && typeof goPage==='function') setTimeout(function(){ goPage('teacher'); }, 500);
+    if(obGoal==='parent' && typeof goPage==='function') setTimeout(function(){ goPage('parent'); }, 500);
+  };
+
+  // Hook into auth success to show overlay
+  var _origShowHome = null;
+  document.addEventListener('DOMContentLoaded', function(){
+    // Wrap goPage to intercept first home navigation
+    var _obShown = false;
+    var origGoPage = window.goPage;
+    if(origGoPage){
+      window.goPage = function(name){
+        if(name==='home' && !_obShown){
+          try{
+            if(localStorage.getItem('nyansa_onboarded')!=='true'){
+              _obShown = true;
+              origGoPage(name);
+              setTimeout(obShowOverlay, 200);
+              return;
+            }
+          }catch(e){}
+        }
+        origGoPage(name);
+      };
+    }
+  });
+})();
+</script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "",
+  authDomain: "nyansa-ai-9498a.firebaseapp.com",
+  projectId: "nyansa-ai-9498a",
+  storageBucket: "nyansa-ai-9498a.firebasestorage.app",
+  messagingSenderId: "788688078262",
+  appId: "1:788688078262:web:f23bf8fef169208b88ad17"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+</script>
+<script src="app.js" defer></script>
+<script src="reminder.js" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Render reminder UI when settings page is opened
+  var _origGoPage = window.goPage;
+  document.addEventListener('click', function(e) {
+    if (document.getElementById('reminder-settings-ui') &&
+        document.getElementById('pg-settings') &&
+        document.getElementById('pg-settings').classList.contains('active')) {
+      if (typeof NyansaReminder !== 'undefined') {
+        NyansaReminder.renderSettingsUI('reminder-settings-ui');
+      }
+    }
+  });
+  // Also render on load if settings is active
+  setTimeout(function() {
+    if (typeof NyansaReminder !== 'undefined') {
+      NyansaReminder.renderSettingsUI('reminder-settings-ui');
+    }
+  }, 800);
+});
+</script>
+<svg width="0" height="0" style="position:absolute;pointer-events:none;">
+  <defs>
+    <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#d4960a"/>
+      <stop offset="100%" style="stop-color:#ffd200"/>
+    </linearGradient>
+  </defs>
+</svg>
+<div class="toast-wrap" id="toast-wrap"></div>
+<div id="pg-auth" class="auth-wrap" style="display:flex;"><div class="auth-card"><div class="auth-flag"></div><div class="auth-body"><div style="font-family:var(--fh);font-weight:800;font-size:22px;margin-bottom:.2rem;">Nyansa<span style="color:var(--gold);"> AI</span></div><div style="font-size:13px;color:var(--muted);margin-bottom:1.6rem;">Powered by Wisdom 🇬🇭</div><div class="auth-tabs"><button class="auth-tab active" id="atab-login" onclick="showAuthMode('login')">Sign In</button><button class="auth-tab" id="atab-signup" onclick="showAuthMode('signup')">Create Account</button></div><div id="auth-err" class="auth-err"></div><div id="auth-ok" class="auth-ok"></div><div id="login-form"><div class="fd"><label class="fl">Email address</label><input type="email" id="li-email" placeholder="you@example.com"></div><div class="fd"><label class="fl">Password</label><input type="password" id="li-pw" placeholder="Enter your password"></div><button class="btn bp bfull" onclick="handleLogin()">Sign In</button><div style="text-align:center;font-size:13px;color:var(--muted);margin-top:1rem;">No account? <a href="#" style="color:var(--gold);font-weight:600;" onclick="showAuthMode('signup');return false;">Create one free</a></div><div style="margin-top:1.4rem;padding-top:1.4rem;border-top:1px solid var(--border);"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:.7rem;font-weight:700;">Quick Demo</div><div class="demo-row"><button class="demo-btn" onclick="demoLogin('student')">🎓 Student Demo</button><button class="demo-btn" onclick="demoLogin('teacher')">👩‍🏫 Teacher Demo</button></div></div></div><div id="signup-form" style="display:none;"><div style="font-size:12.5px;color:var(--muted);margin-bottom:.7rem;">I am a:</div><div class="role-row"><button class="role-btn sel" onclick="selectRole('student',this)"><span class="role-icon">🎓</span><span class="role-name">Student</span><div class="role-desc">Take quizzes</div></button><button class="role-btn" onclick="selectRole('teacher',this)"><span class="role-icon">👩‍🏫</span><span class="role-name">Teacher</span><div class="role-desc">Manage students</div></button></div><div class="fd"><label class="fl">Full name</label><input type="text" id="su-name" placeholder="e.g. Ama Mensah"></div><div class="fd"><label class="fl">Email</label><input type="email" id="su-email" placeholder="you@example.com"></div><div class="fd"><label class="fl">School</label><input type="text" id="su-school" placeholder="e.g. Accra Academy"></div><div class="fd"><label class="fl">Password</label><input type="password" id="su-pw" placeholder="Min. 6 characters" oninput="checkPw(this.value)"><div class="pw-bars"><div class="pw-bar" id="pb1"></div><div class="pw-bar" id="pb2"></div><div class="pw-bar" id="pb3"></div><div class="pw-bar" id="pb4"></div></div></div><div class="fd"><label class="fl">Confirm password</label><input type="password" id="su-confirm" placeholder="Repeat password"></div><button class="btn bp bfull" onclick="handleSignup()">Create My Account</button><div style="text-align:center;font-size:13px;color:var(--muted);margin-top:1rem;">Have an account? <a href="#" style="color:var(--gold);font-weight:600;" onclick="showAuthMode('login');return false;">Sign in</a></div></div></div></div>
+</div>
+<div id="pg-home" class="page"><div class="tnav"><div class="logo-text">Nyansa<span> AI</span></div><div style="flex:1;"></div><div class="upill" id="home-pill" onclick="goPage('settings')"><div class="udot" id="home-udot">?</div><span id="home-uname" style="font-size:13px;font-weight:500;color:var(--text);">User</span></div></div><div class="page-body"><div class="hero"><div class="hero-logo"><span class="hw">Nyansa</span><span class="hg"> AI</span></div><div class="hero-sub">Powered by Wisdom</div><div class="hflag"><div class="r"></div><div class="y"></div><div class="g"></div></div></div><div class="hstats"><div class="hst"><div class="v" id="h-xp">0</div><div class="l">XP</div></div><div class="hst"><div class="v" id="h-qs">0</div><div class="l">Questions</div></div><div class="hst"><div class="v" id="h-acc">—</div><div class="l">Accuracy</div></div><div class="hst"><div class="v" id="h-str">0</div><div class="l">Streak</div></div></div><div style="margin:0 1.2rem 1rem;background:linear-gradient(135deg,#1a0d00,#2a1800);border-radius:var(--rl);padding:1.2rem 1.4rem;position:relative;overflow:hidden;cursor:pointer;" onclick="showSHSGuide()"><div style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(212,150,10,.2),transparent 70%);pointer-events:none;"></div><div style="display:flex;align-items:center;gap:12px;position:relative;z-index:1;"><span style="font-size:32px;">🔥</span><div style="flex:1;"><div style="font-family:var(--fh);font-size:.95rem;font-weight:800;color:#ffd200;">SHS Students — Start Here</div><div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px;">Ages 16–18 · WASSCE Prep · All core subjects</div></div><span style="color:#ffd200;font-size:20px;">→</span></div><div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;position:relative;z-index:1;"><span style="background:rgba(212,150,10,.2);color:#ffd200;border:1px solid rgba(212,150,10,.3);border-radius:99px;padding:3px 10px;font-size:11px;font-weight:600;">WASSCE Prep</span><span style="background:rgba(212,150,10,.2);color:#ffd200;border:1px solid rgba(212,150,10,.3);border-radius:99px;padding:3px 10px;font-size:11px;font-weight:600;">AI Tutor</span><span style="background:rgba(212,150,10,.2);color:#ffd200;border:1px solid rgba(212,150,10,.3);border-radius:99px;padding:3px 10px;font-size:11px;font-weight:600;">Essay Grader</span><span style="background:rgba(212,150,10,.2);color:#ffd200;border:1px solid rgba(212,150,10,.3);border-radius:99px;padding:3px 10px;font-size:11px;font-weight:600;">Study Plan</span><span style="background:rgba(212,150,10,.2);color:#ffd200;border:1px solid rgba(212,150,10,.3);border-radius:99px;padding:3px 10px;font-size:11px;font-weight:600;">Mastery Map</span></div></div><div class="sh-label">Start Learning</div><div class="fgrid"><div class="fcard ga" onclick="goPage('quiz')"><div class="fi">🎯</div><div class="ft">Quiz</div><div class="fd2">Infinite AI questions</div><div class="fa">→</div></div><div class="fcard ra" onclick="goPage('tutor')"><div class="fi">🤖</div><div class="ft">AI Tutor</div><div class="fd2">Ask anything, any language</div><div class="fa">→</div></div><div class="fcard gra" onclick="goPage('essay')"><div class="fi">✍️</div><div class="ft">Essay Grader</div><div class="fd2">Instant AI feedback</div><div class="fa">→</div></div><div class="fcard ga" onclick="goPage('flashcards')"><div class="fi">🃏</div><div class="ft">Flashcards</div><div class="fd2">AI study card decks</div><div class="fa">→</div></div><div class="fcard ra" onclick="goPage('challenge')"><div class="fi">⚡</div><div class="ft">Challenge</div><div class="fd2">Multi-part hard problems</div><div class="fa">→</div></div><div class="fcard gra" onclick="goPage('studyplan')"><div class="fi">📅</div><div class="ft">Study Plan</div><div class="fd2">WASSCE/BECE schedule</div><div class="fa">→</div></div></div><div class="sh-label">Tools</div><div class="fgrid"><div class="fcard ga" onclick="goPage('classroom')"><div class="fi">📡</div><div class="ft">Live Classroom</div><div class="fd2">Real-time group quiz</div><div class="fa">→</div></div><div class="fcard ra" onclick="goPage('parent')"><div class="fi">👨‍👩‍👧</div><div class="ft">Parent Portal</div><div class="fd2">Monitor child's progress</div><div class="fa">→</div></div><div class="fcard gra" onclick="goPage('teacher')"><div class="fi">👩‍🏫</div><div class="ft">Teacher</div><div class="fd2">Manage students</div><div class="fa">→</div></div><div class="fcard ga" onclick="goPage('badges')"><div class="fi">🏆</div><div class="ft">Badges</div><div class="fd2">Achievements & certs</div><div class="fa">→</div></div><div class="fcard ra" onclick="goPage('history')"><div class="fi">📊</div><div class="ft">History</div><div class="fd2">Stats & progress</div><div class="fa">→</div></div><div class="fcard gra" onclick="goPage('leaderboard')"><div class="fi">🥇</div><div class="ft">Leaderboard</div><div class="fd2">Compete across Ghana</div><div class="fa">→</div></div></div></div><div class="bnav"><button class="bni active" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-quiz" class="page"><div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">Quiz</div><span class="chip cg" id="qlvl-chip">Beginner</span></div><div class="page-body"><div class="wrap"><div class="g4" style="margin-bottom:1rem;"><div class="met"><div class="mv" id="q-sc">0</div><div class="ml">Score</div></div><div class="met"><div class="mv" id="q-tot">0</div><div class="ml">Qs</div></div><div class="met"><div class="mv" id="q-acc">—</div><div class="ml">Acc.</div></div><div class="met"><div class="mv" id="q-xp">0</div><div class="ml">XP</div></div></div><div class="g2" style="margin-bottom:.8rem;"><select id="q-sub"><option value="auto">All Subjects</option><optgroup label="Core Subjects"><option value="math">Mathematics</option><option value="english">English Language</option><option value="science">Integrated Science</option><option value="socialstudies">Social Studies</option><option value="rme">R.M.E.</option></optgroup><optgroup label="Primary Subjects (NEW 2024)"><option value="owop">Our World Our People (OWOP)</option><option value="historygh">History of Ghana</option><option value="french">French</option><option value="pe">P.E. & Health</option><option value="twi">Ghanaian Language (Twi)</option></optgroup><optgroup label="JHS Subjects (CCP)"><option value="careertech">Career Technology</option><option value="cad">Creative Arts & Design</option><option value="coding">Computing / ICT</option></optgroup><optgroup label="SHS Science"><option value="physics">Physics</option><option value="chemistry">Chemistry</option><option value="biology">Biology</option><option value="elecmaths">Elective Maths</option></optgroup><optgroup label="SHS Arts & Business"><option value="economics">Economics</option><option value="history">History</option><option value="geography">Geography</option><option value="government">Government</option><option value="literature">Literature in English</option><option value="business">Business Management</option></optgroup></select><select id="q-lvl"><option value="auto">Adaptive</option><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select><select id="q-mode"><option value="mcq">Multiple Choice</option><option value="written">Written Answer</option><option value="mixed">Mixed</option></select><select id="q-translang"><option value="none">No translation</option><option value="Twi">Auto-translate: Twi</option><option value="Fante">Auto-translate: Fante</option><option value="Ewe">Auto-translate: Ewe</option><option value="Ga">Auto-translate: Ga</option><option value="Hausa">Auto-translate: Hausa</option><option value="Dagbani">Auto-translate: Dagbani</option></select></div><div class="qcard"><div class="qmeta"><span class="chip cg" id="q-sub-chip">Math</span><span style="font-size:12px;color:var(--muted);" id="q-diff-lbl">Beginner</span><span style="font-size:12px;color:var(--muted);margin-left:auto;" id="q-num-lbl">Q1</span><div class="timer-ring" id="t-ring"><svg width="44" height="44" viewBox="0 0 44 44"><circle class="tr-bg" cx="22" cy="22" r="18" stroke-dasharray="113" stroke-dashoffset="0"/><circle class="tr-fg" id="t-circle" cx="22" cy="22" r="18" stroke-dasharray="113" stroke-dashoffset="0"/></svg><div class="tr-num" id="t-num">30</div></div></div><div class="pbar-bg"><div class="pbar-fill" id="q-pbar" style="width:2%;"></div></div><div id="q-question"><div class="lr"><div class="sp"></div>Generating question...</div></div><div id="q-options"></div><div id="q-written" style="display:none;"><textarea id="q-written-input" placeholder="Type your answer here..."></textarea><button class="btn bp bsm" style="margin-top:8px;" onclick="submitWritten()" id="q-sub-written">Submit Answer</button></div><div id="q-hint"></div><div id="q-feedback"></div><div id="q-trans"></div><div class="arow"><button class="btn bs bsm" id="q-hint-btn" onclick="showHint()">💡 Hint</button><button class="btn bp" id="q-next-btn" onclick="nextQ()" style="display:none;min-width:110px;">Next →</button><button class="btn bs bsm" onclick="skipQ()">Skip</button><button class="btn bsm bgr" id="q-trans-btn" onclick="translateAns()" style="display:none;">🌍 Translate</button>
+          <button type="button" class="btn bs bsm" onclick="showScoreSummary()">📊 My Score</button></div></div></div></div><div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni active" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-tutor" class="page"><div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">AI Tutor</div><select id="tutor-lang" style="font-size:12px;padding:5px 8px;border-radius:8px;background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--fb);width:auto;"><option value="English">English</option><option value="Twi">Twi</option><option value="Fante">Fante</option><option value="Ewe">Ewe</option><option value="Ga">Ga</option><option value="Hausa">Hausa</option><option value="Dagbani">Dagbani</option></select></div><div class="page-body"><div class="wrap"><div class="chat-win" id="chat-win"><div class="msg-ai"><div class="ai-label">Nyansa AI Tutor</div>Akwaaba! 👋 I am your personal AI tutor for all GES subjects — Basic to SHS.<br><br>Type a question like <strong>&ldquo;Explain quadratic equations&rdquo;</strong> or <strong>&ldquo;Help me write a WASSCE essay.&rdquo;</strong><br><br>💡 <em>Tip: Type a subject name like &ldquo;Physics&rdquo; and I will show topics to pick from!</em><br><br>I can explain in English, Twi, Fante, Ewe, Ga, Hausa, or Dagbani!</div></div><div class="chat-row"><input type="text" id="chat-input" placeholder="e.g. Explain photosynthesis in Twi..." onkeydown="if(event.key==='Enter')sendChat()"><button class="btn bp bsm" id="chat-send" onclick="sendChat()">Send ↗</button></div><div class="qa-row"><button class="qa-btn" onclick="quickAsk('Explain quadratic equations step by step')">📐 Quadratics</button><button class="qa-btn" onclick="quickAsk('Explain the water cycle with Ghana examples')">🌧️ Water Cycle</button><button class="qa-btn" onclick="quickAsk('How do I write a good WASSCE essay?')">✍️ Essay writing</button><button class="qa-btn" onclick="quickAsk('Explain supply and demand using Ghana market examples')">📈 Economics</button><button class="qa-btn" onclick="quickAsk('Explain the causes of the 1966 coup in Ghana')">🇬🇭 Ghana history</button><button class="qa-btn" onclick="quickAsk('What is the difference between acids and bases?')">🧪 Chemistry</button><button class="qa-btn" onclick="quickAsk('Explain Ohms Law with a worked example')">⚡ Physics</button><button class="qa-btn" onclick="quickAsk('Help me understand the 1992 Constitution of Ghana')">⚖️ Government</button><button class="qa-btn" onclick="quickAsk('Explain the 5 strands of Our World Our People (OWOP) subject in the GES curriculum')">🌍 OWOP (New)</button><button class="qa-btn" onclick="quickAsk('What is Career Technology in JHS? Explain its strands and what students learn')">🔧 Career Tech (JHS)</button><button class="qa-btn" onclick="quickAsk('Explain Creative Arts and Design (CAD) as a JHS subject — what are the 4 disciplines?')">🎨 CAD (JHS)</button><button class="qa-btn" onclick="quickAsk('What new topics like AI, Robotics and Cybersecurity are now part of Computing in JHS?')">💻 Computing (New)</button><button class="qa-btn" onclick="quickAsk('Explain the new BECE grading system under the Common Core Programme (CCP)')">📝 BECE Grading</button><button class="qa-btn" style="background:rgba(0,107,63,.07);border-color:rgba(0,107,63,.2);color:#006b3f;" onclick="quickAsk('Explain photosynthesis in Twi language')">🇬🇭 In Twi</button></div></div></div><div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni active" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-essay" class="page"><div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">Essay Grader</div></div><div class="page-body"><div class="wrap"><div class="card cp" style="margin-bottom:1rem;"><div class="fd"><label class="fl">Student Essay or Answer</label><textarea id="essay-txt" placeholder="Paste the student's writing here..." style="min-height:130px;"></textarea></div><div class="g2 fd"><div><label class="fl">Subject</label><select id="essay-sub"><optgroup label="Core"><option>English Language</option><option>Core Mathematics</option><option>Integrated Science</option><option>Social Studies</option><option>RME</option></optgroup><optgroup label="Primary / New 2024"><option>Our World Our People (OWOP)</option><option>History of Ghana</option><option>French</option><option>Career Technology</option><option>Creative Arts & Design</option></optgroup><optgroup label="Science"><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Elective Mathematics</option></optgroup><optgroup label="Arts"><option>Economics</option><option>History</option><option>Geography</option><option>Government</option><option>Literature in English</option></optgroup><optgroup label="Business"><option>Financial Accounting</option><option>Business Management</option></optgroup></select></div><div><label class="fl">Level</label><select id="essay-lvl"><option>Primary</option><option>Secondary</option><option>University</option></select></div></div><div class="fd"><label class="fl">Essay Prompt (optional)</label><input type="text" id="essay-prompt" placeholder="What was the essay question?"></div><button class="btn bp bfull" onclick="gradeEssay()" id="essay-btn">Grade with AI</button><div id="essay-loading" style="display:none;" class="lr"><div class="sp"></div>AI is reading and assessing...</div></div><div id="essay-result"></div></div></div><div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-flashcards" class="page"><div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">Flashcards</div><span class="chip cg" id="fc-badge">0 / 0</span></div><div class="page-body"><div class="wrap"><div class="card cp" style="margin-bottom:1rem;"><div class="g2 fd"><div><label class="fl">Subject</label><select id="fc-sub"><optgroup label="Core"><option value="math">Mathematics</option><option value="english">English Language</option><option value="science">Integrated Science</option><option value="socialstudies">Social Studies</option><option value="rme">RME</option></optgroup><optgroup label="Primary (NEW 2024)"><option value="owop">Our World Our People (OWOP)</option><option value="historygh">History of Ghana</option><option value="french">French</option></optgroup><optgroup label="JHS CCP (NEW)"><option value="careertech">Career Technology</option><option value="cad">Creative Arts & Design</option><option value="coding">Computing / ICT</option></optgroup><optgroup label="Science"><option value="physics">Physics</option><option value="chemistry">Chemistry</option><option value="biology">Biology</option><option value="elecmaths">Elective Maths</option></optgroup><optgroup label="Arts"><option value="economics">Economics</option><option value="history">History</option><option value="geography">Geography</option><option value="government">Government</option><option value="literature">Literature</option></optgroup><optgroup label="Business"><option value="finaccounting">Financial Accounting</option><option value="businessmgmt">Business Management</option></optgroup><optgroup label="Languages"><option value="twi">Twi / Ghanaian Language</option></optgroup></select></div><div><label class="fl">Level</label><select id="fc-lvl"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></div></div><button class="btn bp bfull" onclick="generateFlashcards()" id="fc-btn">Generate Deck (10 cards)</button><div id="fc-loading" style="display:none;" class="lr"><div class="sp"></div>Building your deck...</div></div><div id="fc-area" style="display:none;"><div class="fc-scene"><div class="fc" id="flashcard" onclick="flipCard()"><div class="fc-face fc-front"><div class="fc-lbl">Question — tap to flip</div><div class="fc-q" id="fc-front-txt"></div></div><div class="fc-face fc-back"><div class="fc-lbl">Answer</div><div class="fc-a" id="fc-back-txt"></div></div></div></div><div class="fc-rate"><button class="btn bred bsm" onclick="rateCard('hard')">Hard</button><button class="btn bs bsm" onclick="rateCard('ok')">Got it</button><button class="btn bp bsm" onclick="rateCard('easy')">Easy ✓</button></div><div class="fc-nav" style="margin-top:12px;"><button class="btn bs bsm" onclick="prevCard()">← Prev</button><span style="font-size:13px;color:var(--muted);" id="fc-counter">1 / 10</span><button class="btn bs bsm" onclick="nextCard()">Next →</button></div><div id="fc-summary" style="margin-top:1rem;"></div></div><div id="fc-empty" style="color:var(--muted);font-size:13px;text-align:center;padding:2rem;">Choose a subject and generate a deck to start.</div></div></div><div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-challenge" class="page"><div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">Daily Challenge</div><span class="chip cg">Bonus XP</span></div><div class="page-body"><div class="wrap"><div class="qcard"><div id="chall-content"><div class="lr"><div class="sp"></div>Generating challenge...</div></div><div id="chall-ans-area" style="display:none;margin-top:1rem;"><textarea id="chall-input" placeholder="Show your full working and answer..."></textarea><button class="btn bp bfull" style="margin-top:8px;" onclick="submitChallenge()" id="chall-btn">Submit Challenge</button></div><div id="chall-result" style="margin-top:10px;"></div></div><button class="btn bs bfull" style="margin-top:1rem;" onclick="loadChallenge()" id="chall-new">New Challenge</button></div></div><div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-studyplan" class="page"><div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">Study Plan</div></div><div class="page-body"><div class="wrap"><div class="card cp" style="margin-bottom:1rem;"><div class="g2 fd"><div><label class="fl">Goal</label><select id="sp-goal"><option>WASSCE Exam</option><option>BECE Exam</option><option>University Entrance</option><option>NSAT Assessment (P2/P4/P6/JHS2)</option><option>General Improvement</option></select></div><div><label class="fl">Duration</label><select id="sp-weeks"><option value="1">1 week</option><option value="2" selected>2 weeks</option><option value="4">4 weeks</option><option value="8">8 weeks</option></select></div><div><label class="fl">Weak Subject</label><select id="sp-weak"><optgroup label="Core"><option value="math">Mathematics</option><option value="english">English Language</option><option value="science">Integrated Science</option><option value="socialstudies">Social Studies</option><option value="rme">R.M.E.</option></optgroup><optgroup label="Primary / New 2024"><option value="owop">Our World Our People (OWOP)</option><option value="historygh">History of Ghana</option><option value="french">French</option><option value="careertech">Career Technology</option><option value="cad">Creative Arts & Design</option><option value="coding">Computing / ICT</option></optgroup><optgroup label="SHS Science"><option value="physics">Physics</option><option value="chemistry">Chemistry</option><option value="biology">Biology</option><option value="elecmaths">Elective Maths</option></optgroup><optgroup label="SHS Arts"><option value="economics">Economics</option><option value="history">History</option><option value="geography">Geography</option><option value="government">Government</option><option value="literature">Literature</option><option value="finaccounting">Financial Accounting</option><option value="businessmgmt">Business Management</option></optgroup></select></div><div><label class="fl">Hours/day</label><select id="sp-hrs"><option value="1">1 hour</option><option value="2" selected>2 hours</option><option value="3">3 hours</option><option value="4">4+ hours</option></select></div></div><button class="btn bp bfull" onclick="generateStudyPlan()" id="sp-btn">Generate My Study Plan</button><div id="sp-loading" style="display:none;" class="lr"><div class="sp"></div>AI is building your plan...</div></div><div id="sp-result"></div></div></div><div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-classroom" class="page"><div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">Live Classroom</div><span class="chip cgray" id="cls-status">Inactive</span></div><div class="page-body"><div class="wrap"><div class="card cp" style="margin-bottom:1rem;"><div class="g2 fd"><div><label class="fl">Subject</label><select id="cls-sub"><option value="math">Mathematics</option><option value="english">English</option><option value="science">Science</option><option value="history">History</option><option value="economics">Economics</option></select></div><div><label class="fl">Level</label><select id="cls-lvl"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></div></div><div style="display:flex;gap:8px;"><button class="btn bp" style="flex:1;" onclick="launchClassroom()" id="cls-launch">Launch Session</button><button class="btn bred" onclick="endClassroom()" id="cls-end" style="display:none;flex:1;">End Session</button></div></div><div id="cls-session" style="display:none;"><div class="cls-code-box"><div style="color:rgba(255,255,255,.6);font-size:13px;margin-bottom:.5rem;">Share this code with students</div><div class="cls-code" id="cls-code">——</div><div style="color:rgba(255,255,255,.5);font-size:11px;margin-top:.5rem;">Join at <strong style="color:#ffd200;">nyansaai.netlify.app</strong></div></div><div style="font-size:13px;font-weight:600;margin-bottom:.5rem;">Students (<span id="cls-count">0</span>)</div><div id="cls-students"></div><div id="cls-live-q" style="margin-top:1rem;"></div><div id="cls-results" style="margin-top:1rem;"></div></div></div></div><div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-parent" class="page"><div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">Parent Portal</div></div><div class="page-body"><div class="wrap"><div class="card cp" style="margin-bottom:1rem;"><p style="font-size:13px;color:var(--muted);margin-bottom:1rem;">Monitor your child's XP, accuracy and activity on Nyansa AI.</p><div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="text" id="child-name" placeholder="Child's name" style="flex:2;min-width:120px;"><input type="text" id="child-school" placeholder="School" style="flex:1;min-width:90px;"><button class="btn bp bsm" onclick="addChild()" style="white-space:nowrap;">Add Child</button></div></div><div id="children-list"><p style="font-size:13px;color:var(--muted);text-align:center;padding:2rem;">No children added yet.</p></div></div></div><div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-teacher" class="page"><div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">Teacher Dashboard</div><button class="btn bs bsm" onclick="exportReport()">Export</button></div><div class="page-body"><div class="wrap"><div class="card cp" style="margin-bottom:1rem;"><div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="text" id="t-name" placeholder="Student name" style="flex:2;min-width:120px;"><select id="t-lvl" style="flex:1;"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select><button class="btn bp bsm" onclick="addTStudent()" style="white-space:nowrap;">Add Student</button></div></div><div class="g2" style="margin-bottom:1rem;"><div class="met"><div class="mv" id="t-count">0</div><div class="ml">Students</div></div><div class="met"><div class="mv" id="t-avg">—</div><div class="ml">Avg XP</div></div></div><div id="t-roster"><p style="font-size:13px;color:var(--muted);">No students added yet.</p></div><div class="card cp" style="margin-top:1rem;"><div style="font-size:13px;font-weight:700;margin-bottom:.8rem;">Assign Custom Quiz</div><div class="g2" style="margin-bottom:.8rem;"><select id="t-cq-stu"><option value="">Select student</option></select><select id="t-cq-sub"><option value="math">Mathematics</option><option value="english">English</option><option value="science">Science</option><option value="history">History</option><option value="economics">Economics</option></select><select id="t-cq-lvl"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select><button class="btn bp bsm" onclick="assignQuiz()">Assign →</button></div><div id="t-assign-result"></div></div></div></div><div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-badges" class="page"><div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">Badges & Certificates</div><span class="chip cg" id="badge-count">0 earned</span></div><div class="page-body"><div class="wrap"><div class="cert-card"><div class="cert-stripe"></div><div style="font-size:36px;margin-bottom:.4rem;">🏆</div><div style="font-family:var(--fh);font-size:1.1rem;font-weight:800;color:var(--text);">Certificate of Achievement</div><div class="cert-name" id="cert-name">Your Name</div><div class="cert-det" id="cert-det">Complete quizzes to earn your certificate</div><button class="btn bp bsm" onclick="downloadCert()" id="cert-btn" disabled style="opacity:.4;">Download Certificate</button></div><div style="font-size:13px;font-weight:700;margin-bottom:1rem;">Achievement Badges</div><div class="badge-grid" id="badge-grid"></div></div></div><div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-history" class="page"><div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">History & Progress</div><button class="btn bs bsm" onclick="clearHistory()">Clear</button></div><div class="page-body"><div class="wrap"><div id="hist-chart-wrap" style="display:none;margin-bottom:1.2rem;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;">Last 20 Answers</div><div style="display:flex;align-items:flex-end;gap:3px;height:50px;" id="hist-chart"></div></div><div style="font-size:13px;font-weight:700;margin-bottom:.8rem;">Subject Breakdown</div><div id="hist-breakdown" style="margin-bottom:1.5rem;"></div><div style="font-size:13px;font-weight:700;margin-bottom:.8rem;">Recent Questions</div><div id="hist-list"><p style="font-size:13px;color:var(--muted);">No questions answered yet. Start a quiz!</p></div></div></div><div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni active" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-leaderboard" class="page"><div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">Leaderboard</div></div><div class="page-body"><div class="wrap"><div class="card cp" style="margin-bottom:1rem;"><p style="font-size:13px;color:var(--muted);margin-bottom:.8rem;">Save your score and compete with students across Ghana.</p><div style="display:flex;gap:8px;"><input type="text" id="lb-name" placeholder="Your name"><button class="btn bp bsm" onclick="saveScore()">Save Score</button></div></div><div id="lb-list"><div class="lr"><div class="sp"></div>Loading...</div></div></div></div><div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-settings" class="page"><div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">Settings</div></div><div class="page-body"><div class="wrap"><div class="card cp" style="margin-bottom:1rem;"><div style="font-size:13px;font-weight:700;margin-bottom:.8rem;">Profile</div><div class="fd"><label class="fl">Your Name</label><input type="text" id="pref-name" placeholder="Enter your name"></div><div class="fd"><label class="fl">School</label><input type="text" id="pref-school" placeholder="Your school"></div><div class="fd"><label class="fl">My Class / Year</label><select id="pref-age"><optgroup label="Basic School"><option value="7">Basic 1 (Age 6–7)</option><option value="8">Basic 2 (Age 7–8)</option><option value="9">Basic 3 (Age 8–9)</option><option value="10">Basic 4 (Age 9–10)</option><option value="11">Basic 5 (Age 10–11)</option><option value="12">Basic 6 (Age 11–12)</option></optgroup><optgroup label="Junior High School (JHS)"><option value="13">JHS 1 (Age 12–13)</option><option value="14">JHS 2 (Age 13–14)</option><option value="15">JHS 3 / BECE (Age 14–15)</option></optgroup><optgroup label="Senior High School (SHS)"><option value="16">SHS 1 (Age 15–16)</option><option value="17">SHS 2 (Age 16–17)</option><option value="18" selected>SHS 3 / WASSCE (Age 17–18)</option></optgroup></select></div></div><div class="card cp" style="margin-bottom:1rem;"><div style="font-size:13px;font-weight:700;margin-bottom:.4rem;">Preferences</div><div class="tog-row"><span>Sound effects</span><label class="tog"><input type="checkbox" id="pref-sound" checked><div class="tog-sl"></div></label></div><div class="tog-row"><span>Show question timer</span><label class="tog"><input type="checkbox" id="pref-timer" checked><div class="tog-sl"></div></label></div><div class="tog-row"><span>Auto-advance on correct</span><label class="tog"><input type="checkbox" id="pref-auto"><div class="tog-sl"></div></label></div><div class="tog-row"><span>Dark mode</span><label class="tog"><input type="checkbox" id="pref-dark" onchange="document.body.classList.toggle('dark',this.checked);try{localStorage.setItem('nyansa_dark',this.checked?'1':'0');}catch(e){}"><div class="tog-sl"></div></label></div><div class="tog-row"><span>🔤 Dyslexia-friendly font</span><label class="tog"><input type="checkbox" id="pref-dyslexic" onchange="document.body.classList.toggle('dyslexic',this.checked);try{localStorage.setItem('nyansa_dyslexic',this.checked?'1':'0');}catch(e){}"><div class="tog-sl"></div></label></div><div class="tog-row"><span>🔠 Larger text</span><label class="tog"><input type="checkbox" id="pref-largetext" onchange="document.body.style.fontSize=this.checked?'17px':'15px';try{localStorage.setItem('nyansa_largetext',this.checked?'1':'0');}catch(e){}"><div class="tog-sl"></div></label></div></div><button class="btn bp bfull" onclick="savePrefs()">Save Settings</button><button class="btn bs bfull" style="margin-top:8px;" onclick="handleLogout()">Sign Out</button><div id="reminder-settings-ui" style="margin-top:1rem;"></div></div></div><div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni active" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+<div id="pg-kids-home" class="page"><div class="tnav" style="background:#fff9f0;"><div class="logo-text" style="font-size:22px;">Nyansa <span style="color:var(--red);">Kids</span> 🌟</div><div style="flex:1;"></div><button class="btn bs bsm" onclick="exitKidsMode()" style="font-size:12px;">👤 Switch Mode</button></div><div class="page-body" style="background:linear-gradient(180deg,#fff9f0 0%,#fff3e0 100%);"><div style="text-align:center;padding:2rem 1.2rem 1rem;position:relative;"><div style="font-size:4rem;animation:bounce 2s infinite;">🎓</div><div style="font-family:var(--fh);font-size:2rem;font-weight:800;color:var(--text);margin:.3rem 0;" id="kids-greeting">Hello, Learner!</div><div style="font-size:1rem;color:var(--muted);">What do you want to learn today?</div><div style="display:flex;justify-content:center;gap:6px;margin-top:.8rem;" id="kids-stars-row"></div></div><div style="display:flex;justify-content:center;margin-bottom:1rem;"><div id="kids-level-badge" style="display:inline-flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--gold);border-radius:99px;padding:8px 20px;box-shadow:0 2px 12px rgba(212,150,10,.15);"><span style="font-size:22px;" id="kids-badge-emoji">⭐</span><div><div style="font-family:var(--fh);font-size:14px;font-weight:800;color:var(--gold);" id="kids-level-name">Nursery Star</div><div style="font-size:11px;color:var(--muted);" id="kids-xp-label">0 Stars earned</div></div></div></div><div style="padding:0 1.2rem 1rem;"><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:.8rem;">Choose a Subject 👇</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" id="kids-subject-grid"></div></div><div style="padding:0 1.2rem 1.5rem;"><button class="btn bp bfull" style="font-size:1.1rem;padding:16px;border-radius:16px;font-family:var(--fh);" onclick="startKidsQuiz('all')">
+        🎯 Quick Play — All Subjects!
+      </button></div></div><div class="bnav" style="background:#fff9f0;"><button class="bni active" onclick="goPage('kids-home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('kids-quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('kids-alphabet')"><div class="bni-ico">🔤</div><div class="bni-lbl">ABC</div></button><button class="bni" onclick="goPage('kids-numbers')"><div class="bni-ico">🔢</div><div class="bni-lbl">123</div></button><button class="bni" onclick="goPage('kids-badges')"><div class="bni-ico">🏆</div><div class="bni-lbl">Badges</div></button></div>
+</div>
+<div id="pg-kids-quiz" class="page"><div class="tnav" style="background:#fff9f0;"><button class="back-btn" onclick="goPage('kids-home')">←</button><div class="page-title" id="kids-quiz-title">Let's Learn!</div><div style="display:flex;align-items:center;gap:6px;"><span style="font-size:18px;">⭐</span><span style="font-family:var(--fh);font-size:16px;font-weight:800;color:var(--gold);" id="kids-score-display">0</span></div></div><div class="page-body" style="background:linear-gradient(180deg,#fff9f0,#fff3e0);"><div class="wrap"><div style="display:flex;justify-content:center;gap:8px;margin-bottom:1rem;" id="kids-progress-stars"></div><div id="kids-question-card" style="background:#fff;border-radius:24px;padding:1.8rem;box-shadow:0 4px 24px rgba(212,150,10,.15);border:2px solid rgba(212,150,10,.2);margin-bottom:1.2rem;text-align:center;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><div id="kids-q-emoji" style="font-size:64px;margin-bottom:1rem;"></div><div id="kids-q-text" style="font-family:var(--fh);font-size:1.4rem;font-weight:800;color:var(--text);line-height:1.4;margin-bottom:.5rem;">Loading question...</div><div id="kids-q-hint" style="font-size:14px;color:var(--muted);"></div><button id="kids-speak-btn" onclick="speakQuestion()" style="margin-top:1rem;background:rgba(212,150,10,.1);border:1px solid rgba(212,150,10,.25);border-radius:99px;padding:6px 16px;font-size:13px;cursor:pointer;color:var(--gold);font-weight:600;">🔊 Read to me</button></div><div id="kids-options" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;"></div><div id="kids-written" style="display:none;"><input type="text" id="kids-written-input" placeholder="Type your answer..." style="font-size:1.2rem;padding:14px;border-radius:14px;text-align:center;margin-bottom:10px;"><button class="btn bp bfull" style="font-size:1rem;padding:14px;border-radius:14px;" onclick="submitKidsWritten()">Check My Answer ✓</button></div><div id="kids-result" style="text-align:center;min-height:60px;"></div><button id="kids-next-btn" onclick="nextKidsQuestion()" class="btn bp bfull" style="display:none;font-size:1.1rem;padding:16px;border-radius:16px;font-family:var(--fh);margin-top:.5rem;">Next Question! →</button></div></div><div class="bnav" style="background:#fff9f0;"><button class="bni" onclick="goPage('kids-home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni active" onclick="goPage('kids-quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('kids-alphabet')"><div class="bni-ico">🔤</div><div class="bni-lbl">ABC</div></button><button class="bni" onclick="goPage('kids-numbers')"><div class="bni-ico">🔢</div><div class="bni-lbl">123</div></button><button class="bni" onclick="goPage('kids-badges')"><div class="bni-ico">🏆</div><div class="bni-lbl">Badges</div></button></div>
+</div>
+<div id="pg-kids-alphabet" class="page"><div class="tnav" style="background:#fff9f0;"><button class="back-btn" onclick="goPage('kids-home')">←</button><div class="page-title">Alphabet — ABC 🔤</div></div><div class="page-body" style="background:linear-gradient(180deg,#fff9f0,#fff3e0);"><div class="wrap"><p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:1rem;">Tap a letter to hear it!</p><div id="alphabet-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;"></div><div style="margin-top:1.5rem;font-size:13px;font-weight:700;color:var(--text);margin-bottom:.8rem;">🇬🇭 Twi Words</div><div id="twi-words-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div></div></div><div class="bnav" style="background:#fff9f0;"><button class="bni" onclick="goPage('kids-home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('kids-quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni active" onclick="goPage('kids-alphabet')"><div class="bni-ico">🔤</div><div class="bni-lbl">ABC</div></button><button class="bni" onclick="goPage('kids-numbers')"><div class="bni-ico">🔢</div><div class="bni-lbl">123</div></button><button class="bni" onclick="goPage('kids-badges')"><div class="bni-ico">🏆</div><div class="bni-lbl">Badges</div></button></div>
+</div>
+<div id="pg-kids-numbers" class="page"><div class="tnav" style="background:#fff9f0;"><button class="back-btn" onclick="goPage('kids-home')">←</button><div class="page-title">Numbers — 1 2 3 🔢</div></div><div class="page-body" style="background:linear-gradient(180deg,#fff9f0,#fff3e0);"><div class="wrap"><p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:1rem;">Tap a number to hear it!</p><div id="numbers-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;"></div><div style="margin-top:1.5rem;"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:.8rem;">🎮 Counting Game</div><div id="counting-game" style="background:#fff;border-radius:20px;padding:1.5rem;text-align:center;border:2px solid rgba(212,150,10,.2);"><div id="counting-emoji" style="font-size:2.5rem;letter-spacing:6px;margin-bottom:1rem;min-height:50px;"></div><div id="counting-question" style="font-family:var(--fh);font-size:1.2rem;font-weight:700;margin-bottom:1rem;">How many? 🤔</div><div id="counting-options" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;"></div><div id="counting-result" style="margin-top:.8rem;font-size:1rem;font-weight:700;min-height:24px;"></div></div></div></div></div><div class="bnav" style="background:#fff9f0;"><button class="bni" onclick="goPage('kids-home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('kids-quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('kids-alphabet')"><div class="bni-ico">🔤</div><div class="bni-lbl">ABC</div></button><button class="bni active" onclick="goPage('kids-numbers')"><div class="bni-ico">🔢</div><div class="bni-lbl">123</div></button><button class="bni" onclick="goPage('kids-badges')"><div class="bni-ico">🏆</div><div class="bni-lbl">Badges</div></button></div>
+</div>
+<div id="pg-kids-badges" class="page"><div class="tnav" style="background:#fff9f0;"><button class="back-btn" onclick="goPage('kids-home')">←</button><div class="page-title">My Badges 🏆</div><span id="kids-badge-count" style="font-family:var(--fh);font-size:14px;font-weight:800;color:var(--gold);">0 badges</span></div><div class="page-body" style="background:linear-gradient(180deg,#fff9f0,#fff3e0);"><div class="wrap"><div style="background:#fff;border:3px solid var(--gold);border-radius:20px;padding:1.5rem;text-align:center;margin-bottom:1.5rem;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#ce1126 33.3%,#ffd200 33.3% 66.6%,#006b3f 66.6%);"></div><div style="font-size:48px;margin-bottom:.5rem;">🌟</div><div style="font-family:var(--fh);font-size:1.1rem;font-weight:800;color:var(--text);">Super Learner!</div><div id="kids-cert-name" style="font-family:var(--fh);font-size:1.5rem;font-weight:800;color:var(--gold);margin:.5rem 0;">Little Champion</div><div id="kids-cert-detail" style="font-size:12px;color:var(--muted);margin-bottom:1rem;">Keep learning to earn your certificate!</div><button class="btn bp bsm" onclick="downloadKidsCert()" id="kids-cert-btn">Download My Certificate 🎉</button></div><div style="font-size:14px;font-weight:700;margin-bottom:1rem;">My Achievement Badges</div><div id="kids-badges-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;"></div></div></div><div class="bnav" style="background:#fff9f0;"><button class="bni" onclick="goPage('kids-home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('kids-quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('kids-alphabet')"><div class="bni-ico">🔤</div><div class="bni-lbl">ABC</div></button><button class="bni" onclick="goPage('kids-numbers')"><div class="bni-ico">🔢</div><div class="bni-lbl">123</div></button><button class="bni active" onclick="goPage('kids-badges')"><div class="bni-ico">🏆</div><div class="bni-lbl">Badges</div></button></div>
+</div>
+
+<!-- WASSCE/BECE PREP PAGE -->
+<div id="pg-wassce" class="page">
+  <div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">WASSCE / BECE Prep</div></div>
+  <div class="page-body"><div class="wrap">
+    <div class="card cp" style="margin-bottom:1rem;">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:1rem;">Exam-style questions exactly like WASSCE and BECE past papers — with full marking schemes.</p>
+      <div class="g2 fd">
+        <div><label class="fl">Exam</label><select id="wassce-exam"><option value="WASSCE">WASSCE (SHS)</option><option value="BECE">BECE (JHS)</option></select></div>
+        <div><label class="fl">Subject</label><select id="wassce-subject"><optgroup label="Core Subjects"><option value="Core Mathematics">Core Mathematics</option><option value="English Language">English Language</option><option value="Integrated Science">Integrated Science</option><option value="Social Studies">Social Studies</option></optgroup><optgroup label="JHS CCP (New)"><option value="Career Technology">Career Technology</option><option value="Creative Arts and Design">Creative Arts & Design (CAD)</option><option value="Computing">Computing / ICT</option><option value="Our World Our People">Our World Our People (OWOP)</option><option value="History of Ghana">History of Ghana</option><option value="French">French</option></optgroup><optgroup label="Science Electives"><option value="Physics">Physics</option><option value="Chemistry">Chemistry</option><option value="Biology">Biology</option><option value="Elective Mathematics">Elective Mathematics</option></optgroup><optgroup label="Arts Electives"><option value="Economics">Economics</option><option value="History">History</option><option value="Geography">Geography</option><option value="Government">Government</option><option value="Literature in English">Literature in English</option></optgroup><optgroup label="Business Electives"><option value="Financial Accounting">Financial Accounting</option><option value="Business Management">Business Management</option><option value="Cost Accounting">Cost Accounting</option></optgroup><optgroup label="Other"><option value="Religious and Moral Education">R.M.E.</option><option value="ICT">ICT / Computing</option></optgroup></select></div>
+        <div><label class="fl">Question Type</label><select id="wassce-type"><option value="MCQ">Objective (MCQ)</option><option value="essay">Essay / Theory</option><option value="structured">Structured</option></select></div>
+        <div><label class="fl">Year Style</label><select id="wassce-year"><option value="recent">Recent (2020s)</option><option value="classic">Classic (2010s)</option></select></div>
+      </div>
+      <button type="button" class="btn bp bfull" onclick="generateWASSCE()" id="wassce-btn">Generate Exam Question</button>
+      <div id="wassce-loading" style="display:none;" class="lr"><div class="sp"></div>Generating exam-style question...</div>
+    </div>
+    <div id="wassce-result"></div>
+  </div></div>
+  <div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+
+<!-- MASTERY MAP PAGE -->
+<div id="pg-mastery" class="page">
+  <div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">Mastery Map</div><span class="chip cg" id="mastery-overall">—</span></div>
+  <div class="page-body"><div class="wrap">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1.2rem;">Your strengths and weak areas based on quiz performance.</p>
+    <div id="mastery-grid"><p style="font-size:13px;color:var(--muted);text-align:center;padding:2rem;">Answer at least 5 questions to see your mastery map.</p></div>
+    <div style="margin-top:1.5rem;padding:1rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:.8rem;">AI Recommendation</div>
+      <div id="mastery-ai-rec" style="font-size:13.5px;color:var(--text);line-height:1.7;">Answer more questions to unlock your personalised AI recommendation.</div>
+    </div>
+  </div></div>
+  <div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+
+<!-- MY NOTES PAGE -->
+<div id="pg-notes" class="page">
+  <div class="tnav"><button class="back-btn" onclick="goPage('home')">←</button><div class="page-title">My Notes</div><button type="button" class="btn bp bsm" onclick="saveNote()">Save</button></div>
+  <div class="page-body"><div class="wrap">
+    <div class="card cp" style="margin-bottom:1rem;">
+      <div class="g2 fd">
+        <div><label class="fl">Subject</label><select id="note-subject"><option value="math">Mathematics</option><option value="english">English</option><option value="science">Science</option><option value="history">History</option><option value="economics">Economics</option><option value="government">Government</option><option value="geography">Geography</option></select></div>
+        <div><label class="fl">Title</label><input type="text" id="note-title" placeholder="e.g. Quadratic formula"></div>
+      </div>
+      <div class="fd"><label class="fl">Note Content</label><textarea id="note-content" placeholder="Write your notes here..." style="min-height:120px;"></textarea></div>
+      <div style="display:flex;gap:8px;">
+        <button type="button" class="btn bp" style="flex:1;" onclick="saveNote()">Save Note</button>
+        <button type="button" class="btn bs bsm" onclick="aiSummariseForNotes()">✨ AI Summarise</button>
+      </div>
+      <div id="note-ai-result" style="margin-top:10px;"></div>
+    </div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:.8rem;">Saved Notes</div>
+    <div id="notes-list"><p style="font-size:13px;color:var(--muted);">No notes saved yet.</p></div>
+  </div></div>
+  <div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+
+<!-- CALCULATOR PAGE -->
+<div id="pg-calculator" class="page">
+  <div class="tnav"><button class="back-btn" onclick="goPage('quiz')">←</button><div class="page-title">Calculator & Formulas</div></div>
+  <div class="page-body"><div class="wrap">
+    <div class="card cp" style="margin-bottom:1rem;">
+      <div id="calc-display" style="background:var(--bg3);border-radius:var(--r);padding:1rem;text-align:right;font-family:var(--fh);font-size:1.8rem;font-weight:700;color:var(--text);min-height:60px;word-break:break-all;margin-bottom:.8rem;">0</div>
+      <div id="calc-expr" style="text-align:right;font-size:12px;color:var(--muted);margin-bottom:.8rem;min-height:18px;"></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+        <button type="button" class="calc-btn calc-fn" onclick="calcFn('C')">C</button>
+        <button type="button" class="calc-btn calc-fn" onclick="calcFn('±')">±</button>
+        <button type="button" class="calc-btn calc-fn" onclick="calcFn('%')">%</button>
+        <button type="button" class="calc-btn calc-op" onclick="calcOp('/')">÷</button>
+        <button type="button" class="calc-btn" onclick="calcNum('7')">7</button>
+        <button type="button" class="calc-btn" onclick="calcNum('8')">8</button>
+        <button type="button" class="calc-btn" onclick="calcNum('9')">9</button>
+        <button type="button" class="calc-btn calc-op" onclick="calcOp('*')">×</button>
+        <button type="button" class="calc-btn" onclick="calcNum('4')">4</button>
+        <button type="button" class="calc-btn" onclick="calcNum('5')">5</button>
+        <button type="button" class="calc-btn" onclick="calcNum('6')">6</button>
+        <button type="button" class="calc-btn calc-op" onclick="calcOp('-')">−</button>
+        <button type="button" class="calc-btn" onclick="calcNum('1')">1</button>
+        <button type="button" class="calc-btn" onclick="calcNum('2')">2</button>
+        <button type="button" class="calc-btn" onclick="calcNum('3')">3</button>
+        <button type="button" class="calc-btn calc-op" onclick="calcOp('+')">+</button>
+        <button type="button" class="calc-btn" onclick="calcNum('0')" style="grid-column:span 2;">0</button>
+        <button type="button" class="calc-btn" onclick="calcNum('.')">.</button>
+        <button type="button" class="calc-btn calc-eq" onclick="calcEquals()">=</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+        <button type="button" class="btn bs bsm" onclick="calcFn('sqrt')">√x</button>
+        <button type="button" class="btn bs bsm" onclick="calcFn('sq')">x²</button>
+        <button type="button" class="btn bs bsm" onclick="calcFn('log')">log</button>
+        <button type="button" class="btn bs bsm" onclick="calcFn('sin')">sin</button>
+        <button type="button" class="btn bs bsm" onclick="calcFn('cos')">cos</button>
+        <button type="button" class="btn bs bsm" onclick="calcFn('tan')">tan</button>
+        <button type="button" class="btn bs bsm" onclick="calcFn('pi')">π</button>
+      </div>
+    </div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:.8rem;">📐 Formula Sheet</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;" id="formula-tabs">
+      <button type="button" class="btn bp bsm" onclick="showFormulas('maths')">Maths</button>
+      <button type="button" class="btn bs bsm" onclick="showFormulas('physics')">Physics</button>
+      <button type="button" class="btn bs bsm" onclick="showFormulas('chemistry')">Chemistry</button>
+      <button type="button" class="btn bs bsm" onclick="showFormulas('geometry')">Geometry</button>
+    </div>
+    <div id="formula-content"></div>
+  </div></div>
+  <div class="bnav"><button class="bni" onclick="goPage('home')"><div class="bni-ico">🏠</div><div class="bni-lbl">Home</div></button><button class="bni active" onclick="goPage('quiz')"><div class="bni-ico">🎯</div><div class="bni-lbl">Quiz</div></button><button class="bni" onclick="goPage('tutor')"><div class="bni-ico">🤖</div><div class="bni-lbl">AI Tutor</div></button><button class="bni" onclick="goPage('history')"><div class="bni-ico">📊</div><div class="bni-lbl">History</div></button><button class="bni" onclick="goPage('settings')"><div class="bni-ico">⚙️</div><div class="bni-lbl">Settings</div></button></div>
+</div>
+
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     NYANSA AI — PRODUCTION OPTIMIZATION v1
+     Performance · Accessibility · Mobile-first · UX Polish
+═══════════════════════════════════════════════════════════════ -->
+
+
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+  NYANSA AI — EXTENSION MODULE v5
+  Adds three capabilities to the existing v4 system WITHOUT modifying any
+  existing function. Every feature hooks in via:
+    - Patching existing DOM elements after DOMContentLoaded
+    - Wrapping/extending existing functions (window.fn = wrap(window.fn))
+    - Appending new UI into already-rendered pages
+
+  CAPABILITY 1 — Full SHS/WASSCE Subject System
+  CAPABILITY 2 — Multi-Language System (7 Ghanaian languages)
+  CAPABILITY 3 — Voice System (TTS + STT + Speech-to-Speech mode)
+  ═══════════════════════════════════════════════════════════════════════════ -->
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+  NYANSA AI v5 — SUPPLEMENTAL PATCHES (appended cleanly after NyansaV5 IIFE)
+  Sections 13-17: prompt language patches, WASSCE enrichment, SHS onboarding,
+  adaptive engine wiring, CSS, and expose helpers to global scope.
+  All functions declared in NyansaV5 IIFE are accessed via window.* globals
+  set in the DOMContentLoaded handler of that IIFE (V5Lang, Voice, SHSSelector).
+  ═══════════════════════════════════════════════════════════════════════════ -->
+
+
+</body>
+</html>
