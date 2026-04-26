@@ -115,23 +115,7 @@ const BANK={
     {question:"What are the roots of x² − 5x + 6 = 0?",options:["x=1,x=6","x=2,x=3","x=−2,x=−3","x=−1,x=6"],answer:1,hint:"Find two numbers that multiply to 6 and add to −5.",explanation:"Factorises as (x−2)(x−3) = 0, giving roots x = 2 and x = 3."}]},
   pe:{beginner:[{question:"Players on a football team?",options:["9","10","11","12"],answer:2,hint:"Standard team size.",explanation:"11 players on the field."},{question:"PE stands for?",options:["Physical Education","Personal Exercise","Practical Exercises","Physical Examination"],answer:0,hint:"A school subject.",explanation:"PE = Physical Education."}]},
   twi:{beginner:[{question:"What does 'Medaase' mean?",options:["Good morning","Thank you","Goodbye","How are you"],answer:1,hint:"A polite phrase.",explanation:"Medaase = Thank you in Twi."},{question:"'Good morning' in Twi?",options:["Maakye","Maaha","Medaase","Da yie"],answer:0,hint:"Morning greeting.",explanation:"Maakye = Good morning in Twi."}]},
-  coding:{
-    beginner:[
-      {question:"HTML stands for?",options:["Hyper Text Markup Language","High Tech Modern Language","Hyper Transfer Markup Logic","Home Tool Markup Language"],answer:0,hint:"Used to create web pages.",explanation:"HTML = HyperText Markup Language."},
-      {question:"Output of print(2 + 3 * 4) in Python?",options:["20","14","24","10"],answer:1,hint:"BODMAS: multiplication before addition.",explanation:"3×4=12, then 2+12=14."},
-      {question:"What does ICT stand for?",options:["International Computer Technology","Information and Communications Technology","Integrated Computing Tools","Internet Content Transfer"],answer:1,hint:"A subject in the GES curriculum.",explanation:"ICT = Information and Communications Technology."},
-      {question:"What is cybersecurity?",options:["Building robots","Protecting computers and networks from digital attacks","Designing websites","Programming apps"],answer:1,hint:"It's about keeping digital information safe.",explanation:"Cybersecurity involves protecting computer systems, networks, and data from digital attacks, theft, and damage."},
-      {question:"What does AI stand for in Computing?",options:["Automatic Internet","Artificial Intelligence","Advanced Integration","Automated Input"],answer:1,hint:"A major topic in the new JHS Computing curriculum.",explanation:"AI = Artificial Intelligence — machines that can perform tasks that normally require human intelligence."},
-    ],
-    intermediate:[
-      {question:"In Computing, what is an algorithm?",options:["A type of computer virus","A step-by-step set of instructions to solve a problem","A programming language","A computer hardware component"],answer:1,hint:"Think of it as a recipe for a computer.",explanation:"An algorithm is a precise, step-by-step sequence of instructions for solving a problem or completing a task."},
-      {question:"What is machine learning (a branch of AI)?",options:["Teaching humans to use machines","A system that learns from data to make predictions without explicit programming","Programming robots to walk","Installing software on computers"],answer:1,hint:"The computer learns from examples.",explanation:"Machine learning is a type of AI where systems learn from data and improve their performance over time without being explicitly programmed for each task."},
-      {question:"What is the purpose of a password in cybersecurity?",options:["To slow down computers","To authenticate and protect access to accounts and data","To increase internet speed","To install software"],answer:1,hint:"It's the most common security tool.",explanation:"Passwords authenticate users — they verify your identity to protect access to systems, accounts, and personal data from unauthorised access."},
-      {question:"In computing, what does 'computational thinking' include?",options:["Physical exercise routines","Decomposition, abstraction, pattern recognition, and algorithm design","Memorising programming languages","Drawing circuit diagrams"],answer:1,hint:"It's a problem-solving approach used in the new JHS curriculum.",explanation:"Computational thinking includes decomposition (breaking problems down), abstraction (focusing on key info), pattern recognition, and algorithm design."},
-      {question:"What is robotics in the JHS Computing curriculum?",options:["Drawing robots in art class","Programming and controlling automated machines to perform tasks","Repairing broken computers","Studying the history of technology"],answer:1,hint:"Robots can be programmed — that's what this covers.",explanation:"Robotics in JHS involves programming robots, understanding automation, and basic robotics design and control — introduced from JHS 1 under the CCP."},
-    ]
-  },
-
+  coding:{beginner:[{question:"HTML stands for?",options:["Hyper Text Markup Language","High Tech Modern Language","Hyper Transfer Markup Logic","Home Tool Markup Language"],answer:0,hint:"Used to create web pages.",explanation:"HTML = HyperText Markup Language."},{question:"Output of print(2 + 3 * 4) in Python?",options:["20","14","24","10"],answer:1,hint:"BODMAS: multiplication before addition.",explanation:"3×4=12, then 2+12=14."}]},
   physics:{beginner:[{question:"What is the SI unit of force?",options:["Watt","Joule","Newton","Pascal"],answer:2,hint:"Named after Sir Isaac Newton.",explanation:"The Newton (N) is the SI unit of force. 1N = 1 kg·m/s²."},
     {question:"Which of these is a scalar quantity?",options:["Velocity","Force","Speed","Acceleration"],answer:2,hint:"Scalars have magnitude only, no direction.",explanation:"Speed is scalar — it has magnitude only. Velocity is a vector (magnitude + direction)."},
     {question:"What does Ohm's Law state?",options:["V = IR","P = IV","E = mc²","F = ma"],answer:0,hint:"Relates voltage, current, and resistance.",explanation:"Ohm's Law: Voltage (V) = Current (I) × Resistance (R)."},
@@ -154,67 +138,7 @@ const BANK={
   businessmgmt:{beginner:[{question:"Which of these is NOT a function of management?",options:["Planning","Organising","Manufacturing","Controlling"],answer:2,hint:"Think POLC — the four management functions.",explanation:"The four management functions are Planning, Organising, Leading, and Controlling. Manufacturing is an operational activity."},
     {question:"What does SWOT stand for?",options:["Sales, Work, Output, Target","Strengths, Weaknesses, Opportunities, Threats","Strategy, Workforce, Operations, Technology","Systems, Workflow, Objectives, Tasks"],answer:1,hint:"Used in strategic analysis.",explanation:"SWOT = Strengths, Weaknesses, Opportunities, Threats — a strategic planning tool."},
     {question:"What is the role of a manager?",options:["To do all the work alone","To plan, organise, lead and control resources","To sell products only","To pay workers"],answer:1,hint:"Managers coordinate people and resources.",explanation:"Managers plan goals, organise resources, lead people, and control outcomes (POLC)."}]},
-
-  // ─── NEW GES CURRICULUM 2024-2026 SUBJECTS ───────────────────────────────
-
-  owop:{
-    beginner:[
-      {question:"OWOP stands for?",options:["Our World Our People","Our Way Our Path","One World One Planet","Our Work Our Play"],answer:0,hint:"A primary school subject in Ghana.",explanation:"OWOP = Our World Our People — a core subject taught from Basic 1 to Basic 6."},
-      {question:"How many main strands does the OWOP subject have?",options:["3","4","5","6"],answer:2,hint:"Think of the main themes in OWOP.",explanation:"OWOP has 5 strands: All About Us, Our Environment, Our Communities, Our Nation Ghana, and The Wider World."},
-      {question:"Which strand of OWOP covers national symbols like the Ghana flag and coat of arms?",options:["All About Us","Our Environment","Our Communities","Our Nation Ghana"],answer:3,hint:"It focuses on Ghana as a country.",explanation:"The 'Our Nation Ghana' strand covers national symbols, regions, governance, and patriotism."},
-      {question:"From which Basic level is OWOP taught in Ghana?",options:["Basic 3","Basic 2","Basic 1","Basic 4"],answer:2,hint:"It starts right at the beginning of primary school.",explanation:"OWOP is taught from Basic 1 all the way to Basic 6."},
-      {question:"Which OWOP strand covers topics like recycling, conservation, and climate change?",options:["All About Us","Our Environment","Our Nation Ghana","The Wider World"],answer:1,hint:"It deals with plants, animals, water, and the natural world.",explanation:"The 'Our Environment' strand covers plants, animals, water bodies, weather, climate, conservation, and recycling."},
-    ],
-    intermediate:[
-      {question:"What does the 'All About Us' strand in OWOP focus on?",options:["African countries and trade","Family, personal identity, self-worth, and being Ghanaian","National governance and politics","International organisations"],answer:1,hint:"It's the most personal strand — about you and your family.",explanation:"'All About Us' covers family structure, personal identity, human uniqueness, God, healthy body, and self-worth."},
-      {question:"Which OWOP strand introduces students to topics like migration and world peace?",options:["Our Communities","Our Nation Ghana","The Wider World","Our Environment"],answer:2,hint:"It looks beyond Ghana to the globe.",explanation:"'The Wider World' strand covers other countries, Africa, international organisations, trade, migration, and global issues."},
-      {question:"OWOP replaced which older subjects at the primary level?",options:["Physics and Chemistry","Environmental Studies and fragmented Social Studies","History and Geography","RME and PE"],answer:1,hint:"OWOP merged several subjects that used to be separate.",explanation:"OWOP replaced the old Environmental Studies and the fragmented Social Studies that existed at primary level before the reforms."},
-    ]
-  },
-
-  historygh:{
-    beginner:[
-      {question:"Ghana gained independence from which colonial power?",options:["France","Portugal","Britain","Germany"],answer:2,hint:"The Gold Coast was part of this empire.",explanation:"Ghana (then called the Gold Coast) gained independence from Britain on 6 March 1957."},
-      {question:"Who was Ghana's first President?",options:["J.J. Rawlings","Kofi Busia","Kwame Nkrumah","John Kufuor"],answer:2,hint:"He founded the CPP and said 'Africa must unite'.",explanation:"Kwame Nkrumah became Ghana's first Prime Minister in 1957 and first President in 1960."},
-      {question:"What was Ghana called before independence?",options:["Ashanti Empire","Togoland","Gold Coast","British West Africa"],answer:2,hint:"Named after a major export commodity.",explanation:"Ghana was called the Gold Coast under British colonial rule, named for its gold trade."},
-      {question:"In what year did Ghana gain independence?",options:["1945","1957","1960","1966"],answer:1,hint:"First sub-Saharan African country to gain independence.",explanation:"Ghana gained independence on 6 March 1957, becoming the first sub-Saharan African country to do so."},
-    ],
-    intermediate:[
-      {question:"Which Ghanaian leader was overthrown by a coup in 1966?",options:["Kofi Busia","Kwame Nkrumah","Hilla Limann","J.J. Rawlings"],answer:1,hint:"He was Ghana's first President.",explanation:"Kwame Nkrumah was overthrown by the National Liberation Council (NLC) in February 1966."},
-      {question:"What is the significance of the year 1992 in Ghanaian history?",options:["Ghana gained independence","Ghana joined ECOWAS","Ghana's Fourth Republic was established","The Akosombo Dam was built"],answer:2,hint:"A new constitution was adopted this year.",explanation:"In 1992 Ghana adopted a new constitution, establishing the Fourth Republic and returning to democratic governance."},
-      {question:"The Akosombo Dam, which created Lake Volta, was completed in which year?",options:["1957","1965","1972","1980"],answer:1,hint:"Built during the Nkrumah era.",explanation:"The Akosombo Dam was completed in 1965 during Nkrumah's presidency, creating Lake Volta — one of the world's largest man-made lakes."},
-    ]
-  },
-
-  careertech:{
-    beginner:[
-      {question:"Career Technology is a brand new subject taught at which level in Ghana?",options:["Primary (B1-B6)","Junior High School (JHS 1-3)","Senior High School (SHS)","University"],answer:1,hint:"Part of the CCP — the new JHS programme.",explanation:"Career Technology is a compulsory JHS subject introduced under the Common Core Programme (CCP), taught from JHS 1 to JHS 3."},
-      {question:"Which of these is a strand in Career Technology?",options:["Ancient History","Entrepreneurship","Advanced Calculus","Classical Literature"],answer:1,hint:"Career Tech focuses on practical and business skills.",explanation:"Entrepreneurship is one of Career Technology's key strands, covering business ideas, planning, marketing, and budgeting."},
-      {question:"Career Technology replaced which old subject at JHS level?",options:["Social Studies","Technical/Vocational Studies","Religious Studies","Geography"],answer:1,hint:"The old subject also involved practical skills.",explanation:"Career Technology replaces the old Technical/Vocational subject and covers entrepreneurship, STEM projects, agriculture, home economics, and more."},
-      {question:"Which of these is NOT a strand in Career Technology?",options:["Agriculture & Environment","Home Economics","Creative Writing","STEM Projects"],answer:2,hint:"Career Tech focuses on practical, technical and business skills.",explanation:"Creative Writing is not a strand. The strands are: Agriculture & Environment, Home Economics, Visual Arts & Design, Technical Drawing, ICT & Electronics, Entrepreneurship, and STEM Projects."},
-    ],
-    intermediate:[
-      {question:"What is the main purpose of Career Technology in JHS?",options:["To teach students classical music","To provide employable skills and boost national development","To prepare students for WASSCE only","To replace Mathematics at JHS level"],answer:1,hint:"It's practical and aimed at the real world.",explanation:"Career Technology provides the knowledge, skills, and attitudes needed for competent training, employable skills, and national development through practical work."},
-      {question:"The STEM Projects strand in Career Technology involves:",options:["Reading science textbooks only","Integrated science-technology-engineering projects with real-world applications","Writing essays about scientists","Memorising periodic table elements"],answer:1,hint:"STEM = Science Technology Engineering Mathematics.",explanation:"STEM Projects in Career Tech involve hands-on, integrated projects that apply science, technology, engineering, and maths to real-world problems."},
-    ]
-  },
-
-  cad:{
-    beginner:[
-      {question:"CAD stands for which subject in the GES curriculum?",options:["Computer Aided Design","Creative Arts and Design","Career Arts and Drama","Computing and Digital Studies"],answer:1,hint:"It's a brand new JHS subject combining four art disciplines.",explanation:"CAD = Creative Arts and Design — a brand new JHS subject introduced under the CCP combining Visual Arts, Music, Dance & Drama, and Design."},
-      {question:"How many disciplines does Creative Arts and Design (CAD) combine?",options:["2","3","4","5"],answer:2,hint:"Think of the major art forms it brings together.",explanation:"CAD combines 4 disciplines: Design, Visual Arts, Music, and Dance & Drama."},
-      {question:"Which of these is a discipline within CAD?",options:["Cybersecurity","Technical Drawing","Music","Entrepreneurship"],answer:2,hint:"CAD includes a performing arts discipline.",explanation:"Music is one of the 4 CAD disciplines. The others are Design, Visual Arts, and Dance & Drama."},
-      {question:"At which school level is CAD taught in Ghana?",options:["Primary","JHS only","SHS only","Both JHS and SHS"],answer:1,hint:"It's part of the Common Core Programme (CCP).",explanation:"CAD is a compulsory JHS subject (Basic 7–9) under the CCP."},
-    ],
-    intermediate:[
-      {question:"What percentage of time per week does CAD receive in the JHS timetable?",options:["100 minutes","150 minutes","200 minutes","250 minutes"],answer:2,hint:"It has one of the longest time allocations in the CCP.",explanation:"CAD receives 200 minutes per week — one of the longest allocations in the JHS CCP timetable."},
-      {question:"The Design discipline in CAD teaches students:",options:["Advanced physics concepts","Design thinking, product design, graphic design, and problem-solving through design","How to write computer code","Cooking and nutrition"],answer:1,hint:"It's about creating and problem-solving visually.",explanation:"The Design discipline in CAD covers design thinking, product design, graphic design basics, and solving problems through a design process."},
-      {question:"Which Ghanaian cultural heritage is specifically incorporated in the Music discipline of CAD?",options:["Classical European music","American hip-hop","Traditional Ghanaian music, instruments, and oral traditions","Latin American rhythms"],answer:2,hint:"CAD integrates local culture with global arts education.",explanation:"The Music discipline in CAD includes Ghanaian traditional music, traditional instruments, music theory, composition, and performance — rooting students in their cultural heritage."},
-    ]
-  },
-
 };
-
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function toast(msg,icon,type,dur){
@@ -512,18 +436,8 @@ var _aiQ=[];var _pfBusy=false;
 async function _prefetch(sub,lvl,mode){
   if(_pfBusy||usingFallback)return;_pfBusy=true;
   var isW=mode==='written';
-  // GES 2024-2026 curriculum context for new subjects
-  var subjectContext = {
-    owop: 'Our World Our People (OWOP) — Ghana GES primary subject (Basic 1-6) with 5 strands: All About Us, Our Environment, Our Communities, Our Nation Ghana, The Wider World. Covers family, environment, communities, national symbols, Ghana regions, Africa, and global issues.',
-    careertech: 'Career Technology — new Ghana GES JHS (CCP) subject covering: Entrepreneurship, Agriculture & Environment, Home Economics, Visual Arts & Design, Technical Drawing, ICT & Electronics, and STEM Projects. Replaces old Technical/Vocational studies.',
-    cad: 'Creative Arts and Design (CAD) — new Ghana GES JHS (CCP) subject combining 4 disciplines: Design, Visual Arts, Music, and Dance & Drama. 200 minutes/week. Integrates Ghanaian cultural heritage.',
-    historygh: 'History of Ghana — GES standalone subject covering pre-colonial kingdoms, colonialism, independence (1957), Nkrumah era, political transitions, 1992 constitution, and modern Ghana.',
-    coding: 'Computing/ICT — Ghana GES CCP subject covering digital literacy, computational thinking, programming basics, robotics (JHS), cybersecurity, and data management.',
-  };
-  var ctx = subjectContext[sub] ? ' Context: '+subjectContext[sub] : '';
-  var subLabel = {owop:'Our World Our People (OWOP)',careertech:'Career Technology',cad:'Creative Arts and Design (CAD)',historygh:'History of Ghana'}[sub] || sub;
-  var p=isW?'Generate a '+lvl+'-level '+subLabel+' short-answer question for a Ghanaian student.'+ctx+' Return ONLY JSON: {"question":"...","sampleAnswer":"...","hint":"...","explanation":"..."}'
-    :'Generate a unique '+lvl+'-level '+subLabel+' multiple choice question for a Ghanaian student.'+ctx+' Return ONLY JSON: {"question":"...","options":["a","b","c","d"],"answer":0,"hint":"...","explanation":"..."}. answer is 0-3.';
+  var p=isW?'Generate a '+lvl+' '+sub+' short-answer question for a Ghanaian student. Return ONLY JSON: {"question":"...","sampleAnswer":"...","hint":"...","explanation":"..."}'
+    :'Generate a unique '+lvl+' '+sub+' multiple choice question for a Ghanaian student. Return ONLY JSON: {"question":"...","options":["a","b","c","d"],"answer":0,"hint":"...","explanation":"..."}. answer is 0-3.';
   try{var r=await ai(p,600);var q=parseJSON(r);q.subject=sub;q.mode=isW?'written':'mcq';q.difficulty=lvl;if(_aiQ.length<3)_aiQ.push(q);}catch(e){usingFallback=true;}
   _pfBusy=false;
 }
@@ -2126,10 +2040,6 @@ async function sendChat() {
     ict:       ['HTML Basics','Spreadsheets','Internet Safety','Databases','Programming Logic'],
     french:    ['Greetings & Introductions','Numbers','Present Tense','Describing People','Directions'],
     rme:       ['Moral Values','Religious Beliefs','Family Life','Citizenship','Environmental Stewardship'],
-    owop:      ['All About Us','Our Environment','Our Communities','Our Nation Ghana','The Wider World'],
-    careertech:['Entrepreneurship','Agriculture & Environment','Home Economics','Technical Drawing','STEM Projects','ICT & Electronics'],
-    cad:       ['Design Thinking','Visual Arts','Music (Ghanaian Heritage)','Dance & Drama','Graphic Design','Product Design'],
-    historygh: ['Pre-Colonial Ghana','Colonial Era','Independence 1957','Nkrumah Presidency','Coups & Transitions','1992 Constitution'],
   };
 
   const lower = rawMsg.toLowerCase().trim();
@@ -3611,9 +3521,7 @@ function subjectDisplayName(key) {
     economics:'Economics', business:'Business Studies', rme:'R.M.E.',
     socialstudies:'Social Studies', french:'French', literature:'Literature',
     government:'Government', elecmaths:'Elective Maths', pe:'Physical Education',
-    twi:'Twi Language', owop:'Our World Our People (OWOP)', historygh:'History of Ghana',
-    careertech:'Career Technology', cad:'Creative Arts & Design (CAD)',
-    physics:'Physics', chemistry:'Chemistry', biology:'Biology'
+    twi:'Twi Language'
   };
   return legacy[key] || (key.charAt(0).toUpperCase() + key.slice(1));
 }
