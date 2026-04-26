@@ -1,68 +1,34 @@
-{
-  "name": "Nyansa AI",
-  "short_name": "Nyansa AI",
-  "description": "Powered by Wisdom \u2014 Ghana's AI learning platform for ages 4\u201318. Aligned with GES curriculum.",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#fffbf2",
-  "theme_color": "#d4960a",
-  "orientation": "portrait-primary",
-  "lang": "en-GH",
-  "categories": [
-    "education",
-    "kids"
-  ],
-  "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Start Quiz",
-      "short_name": "Quiz",
-      "description": "Jump into an Sua AI quiz",
-      "url": "./",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "AI Tutor",
-      "short_name": "Tutor",
-      "description": "Ask the Sua AI tutor anything",
-      "url": "./",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "Kids Mode",
-      "short_name": "Kids",
-      "description": "Kids learning for ages 4\u20139",
-      "url": "./",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
-    }
-  ],
-  "scope": "./"
-}
+[build]
+  functions = "netlify/functions"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/styles.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/app.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/icon-192.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/icon-512.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
