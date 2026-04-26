@@ -594,7 +594,7 @@
       </div>
     </div>
 
-    <button class="btn-primary" onclick="alert('🚀 Launching Nyansa AI dashboard!\n\n(In production this redirects to the main app)')">Enter Nyansa AI →</button>
+    <button class="btn-primary" onclick="window.location.href='index.html'">Enter Nyansa AI →</button>
   </div>
 
 </div>
@@ -704,6 +704,16 @@
     if (n === 2 && (selectedRole === 'parent' || selectedRole === 'teacher')) {
       goStep(3);
     }
+  }
+
+  function launchApp() {
+    try {
+      localStorage.setItem('nyansa_role', selectedRole || 'student');
+      localStorage.setItem('nyansa_class', selectedClass || '');
+      localStorage.setItem('nyansa_goal', selectedGoal || 'general');
+      localStorage.setItem('nyansa_onboarded', 'true');
+    } catch(e) {}
+    window.location.href = 'index.html';
   }
 
   function finish() {

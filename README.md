@@ -1,19 +1,34 @@
-# Nyansa AI 🇬🇭
+[build]
+  functions = "netlify/functions"
 
-A free AI-powered learning platform for Ghanaian students from Basic 1 to SHS.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
-## Features
-- AI Tutor powered by Groq & Gemini
-- Quiz engine with 30 SHS subjects
-- WASSCE/BECE exam preparation
-- Essay grader & flashcards
-- 7 Ghanaian language support
-- Voice input & text-to-speech
-- Daily study reminders
-- Accessibility features (dyslexia font, large text)
+[[headers]]
+  for = "/styles.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
-## Live Site
-[nyansaai.netlify.app](https://nyansaai.netlify.app)
+[[headers]]
+  for = "/app.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
-## License
-MIT © 2026 Godfred Ansah
+[[headers]]
+  for = "/icon-192.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/icon-512.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
