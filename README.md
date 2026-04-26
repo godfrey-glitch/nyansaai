@@ -59,4 +59,4 @@ Nyansa AI is a free, mobile-first learning platform built specifically for Ghana
 
 ## License
 
-MIT © 2026 Godfrey Ansah
+MIT © 2026 Godfred Nana Yaw Ansah
