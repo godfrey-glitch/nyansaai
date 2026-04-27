@@ -27,7 +27,7 @@
 <!-- ═══ NYANSA ONBOARDING OVERLAY ═══ -->
 <style>
 #onboarding-overlay {
-  position: fixed; inset: 0; z-index: 99990;
+  position: fixed; inset: 0; z-index: 999999;
   overflow-y: auto; background: #080c10;
   display: none; flex-direction: column;
   align-items: center; justify-content: center;
@@ -232,7 +232,7 @@
     // Wait for auth state, then check
     setTimeout(function(){
       try { if(localStorage.getItem('nyansa_onboarded')!=='true') obShow(); } catch(e){ obShow(); }
-    }, 2000);
+    }, 300);
   });
 })();
 </script>
@@ -490,7 +490,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
 const firebaseConfig = {
-  apiKey: "",
+  apiKey: "AIzaSyBhwkBfgVtakP26MHMaI_BckBT5hSXxH2s",
   authDomain: "nyansa-ai-9498a.firebaseapp.com",
   projectId: "nyansa-ai-9498a",
   storageBucket: "nyansa-ai-9498a.firebasestorage.app",
